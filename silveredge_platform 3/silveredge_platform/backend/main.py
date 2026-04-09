@@ -16,7 +16,9 @@ from contextlib import asynccontextmanager
 from typing import Any, Callable, Dict, List, Optional, Tuple, AsyncGenerator
 
 import aiohttp, numpy as np, pandas as pd, pyotp, structlog
-from fastapi import FastAPI, HTTPException, Depends, WebSocket, WebSocketDisconnect, status
+from fastapi import FastAPI, HTTPException, Depends, WebSocket, WebSocketDisconnect, status, Request
+from fastapi.responses import FileResponse, HTMLResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
@@ -1626,6 +1628,27 @@ async def start_mock_feed():
         except Exception as e:
             logger.error(f"Mock feed error: {e}")
             await asyncio.sleep(5)
+
+
+# ═══════════════════════════════════════════
+# SERVE REACT FRONTEND
+# ═══════════════════════════════════════════
+
+_FRONTEND_DIST = os.path.join(os.path.dirname(__file__), "..", "frontend", "dist")
+
+if os.path.isdir(_FRONTEND_DIST):
+    app.mount("/assets", StaticFiles(directory=os.path.join(_FRONTEND_DIST, "assets")), name="assets")
+
+    @app.get("/{full_path:path}", include_in_schema=False)
+    async def serve_frontend(full_path: str, request: Request):
+        index = os.path.join(_FRONTEND_DIST, "index.html")
+        if os.path.exists(index):
+            return FileResponse(index)
+        return HTMLResponse("<h1>SilverEdge API is running</h1><p>Visit <a href='/docs'>/docs</a> for API documentation.</p>")
+else:
+    @app.get("/", include_in_schema=False)
+    async def root():
+        return HTMLResponse("<h1>SilverEdge API is running</h1><p>Visit <a href='/docs'>/docs</a> for API documentation.</p>")
 
 
 if __name__=="__main__":
