@@ -2,6 +2,7 @@ services:
   # Python Backend Service
   - type: web
     name: direkt-backend
+    plan: free
     env: python
     rootDir: ssss
     buildCommand: pip install -r requirements.txt
