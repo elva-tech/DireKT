@@ -25,6 +25,8 @@ from smart_allocator_external import (
     pick_contract_for_expiry_months,
     pick_best_contract,
     resolve_token_for_tradingsymbol,
+    smart_allocate,
+    SmartAllocateRequest,
 )
 from trading_bot import SilverFuturesTradingBot
 
@@ -188,34 +190,13 @@ def get_smart_allocation(balance: float, symbol_type: str = "SILVER"):
     if req_symbol_type not in ("SILVER", "SILVERM", "SILVERMIC"):
         req_symbol_type = "SILVER"
     try:
-        response = requests.post(
-            f"{SMART_ALLOCATOR_URL}/api/smart-allocate",
-            json={
-                "available_amount": balance,
-                "symbol_type": req_symbol_type,
-                "product_type": "CARRYFORWARD"
-            },
-            timeout=10
+        # Call the imported allocator logic directly (no localhost HTTP needed)
+        body = SmartAllocateRequest(
+            available_amount=balance,
+            symbol_type=req_symbol_type,
+            product_type="CARRYFORWARD"
         )
-
-        if response.status_code == 200:
-            return response.json()
-        detail = {}
-        try:
-            detail = response.json()
-        except Exception:
-            detail = {"message": (response.text or "").strip()[:400]}
-        return {
-            "status": False,
-            "error": (
-                detail.get("detail", {}).get("message")
-                if isinstance(detail.get("detail"), dict)
-                else detail.get("detail")
-                or detail.get("message")
-                or f"Allocator HTTP {response.status_code}"
-            ),
-            "details": detail,
-        }
+        return smart_allocate(body)
     except Exception as e:
         return {"status": False, "error": str(e)}
 
@@ -438,7 +419,7 @@ async def health():
     """Health check"""
     return {
         "status": "healthy",
-        "smart_allocator": "connected" if requests.get(f"{SMART_ALLOCATOR_URL}/health", timeout=5).status_code == 200 else "disconnected",
+        "smart_allocator": "embedded",
         "trading_systems": trading_systems
     }
 
