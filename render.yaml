@@ -23,10 +23,7 @@ services:
     publishDir: dist
     envVars:
       - key: VITE_API_URL
-        fromService:
-          name: direkt-backend
-          type: web
-          property: host
+        value: https://direkt-backend.onrender.com
     rewriteRules:
       - source: /.*
         destination: /index.html
