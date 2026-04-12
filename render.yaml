@@ -6,7 +6,7 @@ services:
     env: python
     rootDir: ssss
     buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn backend_server:app --host 0.0.0.0 --port $PORT
+    startCommand: uvicorn trading_integration_service:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: PYTHON_VERSION
         value: 3.10.12

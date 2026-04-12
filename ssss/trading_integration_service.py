@@ -13,6 +13,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import requests
 import json
+import uuid
 from typing import Optional
 import threading
 
@@ -164,6 +165,10 @@ class TradingStartRequest(BaseModel):
     tradingsymbol: Optional[str] = None
     symbol_token: Optional[str] = None
     max_lots: Optional[int] = None
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
 
 class TradingStatusResponse(BaseModel):
     status: bool
@@ -404,6 +409,28 @@ async def root():
         "message": "MCX Trading Integration Service",
         "systems": list(trading_systems.keys()),
         "smart_allocator": SMART_ALLOCATOR_URL
+    }
+
+@app.post("/api/auth/login")
+async def login(request: LoginRequest):
+    """Simplified login for production paper trading."""
+    if not request.username or not request.password:
+        return {"success": False, "message": "Username and password required"}
+    
+    # Paper trading accepts any admin-like credentials
+    session_id = f"sess_{uuid.uuid4().hex[:12]}"
+    user_data = {
+        "user_id": f"user_{uuid.uuid4().hex[:8]}",
+        "username": request.username,
+        "name": request.username.capitalize(),
+        "role": "trader"
+    }
+    
+    return {
+        "success": True,
+        "session_id": session_id,
+        "user": user_data,
+        "message": "Login successful"
     }
 
 @app.get("/health")

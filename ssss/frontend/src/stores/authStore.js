@@ -1,5 +1,7 @@
 import { create } from 'zustand'
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+
 export const useAuthStore = create((set, get) => ({
   // State
   user: null,
@@ -22,8 +24,7 @@ export const useAuthStore = create((set, get) => ({
   login: async (credentials) => {
     try {
       set({ isLoading: true })
-
-      const response = await fetch('http://localhost:8000/api/auth/login', {
+      const response = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -90,7 +91,7 @@ export const useAuthStore = create((set, get) => ({
       const { tradingSystemActive } = get()
       if (tradingSystemActive) {
         try {
-          await fetch('http://localhost:8001/api/trading/stop/ml', {
+          await fetch(`${API_URL}/api/trading/stop/ml`, {
             method: 'POST'
           })
         } catch (err) {
@@ -98,7 +99,7 @@ export const useAuthStore = create((set, get) => ({
         }
         
         try {
-          await fetch('http://localhost:8001/api/trading/stop/llm', {
+          await fetch(`${API_URL}/api/trading/stop/llm`, {
             method: 'POST'
           })
         } catch (err) {
@@ -106,7 +107,7 @@ export const useAuthStore = create((set, get) => ({
         }
 
         try {
-          await fetch('http://localhost:8001/api/trading/stop/hybrid', {
+          await fetch(`${API_URL}/api/trading/stop/hybrid`, {
             method: 'POST'
           })
         } catch (err) {
@@ -203,7 +204,7 @@ export const useAuthStore = create((set, get) => ({
     try {
       const { balanceAmount } = get()
       // Use integration service as a stable gateway to allocator.
-      const response = await fetch(`http://localhost:8001/api/allocation/${balanceAmount}`)
+      const response = await fetch(`${API_URL}/api/allocation/${balanceAmount}`)
       const result = await response.json().catch(() => ({}))
 
       if (!response.ok) {
@@ -250,7 +251,7 @@ export const useAuthStore = create((set, get) => ({
       } = get()
       const maxLots = Number(lotAllocation?.buy_orders?.[0]?.lots || lotAllocation?.summary?.total_lots || 0)
       
-      const response = await fetch('http://localhost:8001/api/trading/start', {
+      const response = await fetch(`${API_URL}/api/trading/start`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -313,7 +314,7 @@ export const useAuthStore = create((set, get) => ({
   },
 
   emergencyExitTradingSystem: async (strategy) => {
-    const response = await fetch(`http://localhost:8001/api/trading/emergency-exit/${strategy}`, {
+    const response = await fetch(`${API_URL}/api/trading/emergency-exit/${strategy}`, {
       method: 'POST'
     })
     const result = await response.json()
@@ -324,7 +325,7 @@ export const useAuthStore = create((set, get) => ({
   },
 
   manualResetTradingSystem: async (strategy) => {
-    const response = await fetch(`http://localhost:8001/api/trading/manual-reset/${strategy}`, {
+    const response = await fetch(`${API_URL}/api/trading/manual-reset/${strategy}`, {
       method: 'POST'
     })
     const result = await response.json()
@@ -336,7 +337,7 @@ export const useAuthStore = create((set, get) => ({
 
   getTradingSystemStatus: async (strategy) => {
     try {
-      const response = await fetch(`http://localhost:8001/api/trading/status/${strategy}`)
+      const response = await fetch(`${API_URL}/api/trading/status/${strategy}`)
       const result = await response.json()
       const active = Boolean(result?.active)
       if (strategy === 'ml') {
