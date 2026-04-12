@@ -1,0 +1,32 @@
+services:
+  # Python Backend Service
+  - type: web
+    name: direkt-backend
+    env: python
+    rootDir: ssss
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn backend_server:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.12
+      - key: SECRET_KEY
+        generateValue: true
+      - key: REDIS_URL
+        value: "" # Optional: add your external Redis URL here if needed
+
+  # React Frontend Service
+  - type: web
+    name: direkt-frontend
+    env: static
+    rootDir: ssss/frontend
+    buildCommand: npm install && npm run build
+    publishDir: dist
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          name: direkt-backend
+          type: web
+          property: host
+    rewriteRules:
+      - source: /.*
+        destination: /index.html
