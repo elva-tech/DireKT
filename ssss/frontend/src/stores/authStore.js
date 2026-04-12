@@ -287,7 +287,7 @@ export const useAuthStore = create((set, get) => ({
 
   stopTradingSystem: async (strategy) => {
     try {
-      const response = await fetch(`http://localhost:8001/api/trading/stop/${strategy}`, {
+      const response = await fetch(`${API_URL}/api/trading/stop/${strategy}`, {
         method: 'POST'
       })
       

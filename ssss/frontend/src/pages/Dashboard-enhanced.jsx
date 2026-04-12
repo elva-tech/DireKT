@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { useAuthStore } from '../stores/authStore'
 
-const INTEGRATION_BASE = 'http://localhost:8001'
+const INTEGRATION_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000'
 // Slightly slower polling reduces Angel API rate limits; integration also caches ~8s server-side.
 const LIVE_POLL_MS = 6000
 const CHART_MAX_POINTS = 48

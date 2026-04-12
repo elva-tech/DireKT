@@ -193,9 +193,9 @@ function Trading() {
     const refreshMetrics = async () => {
       try {
         const [mlRes, llmRes, hybridRes] = await Promise.all([
-          fetch('http://localhost:8001/api/trading/metrics/ml'),
-          fetch('http://localhost:8001/api/trading/metrics/llm'),
-          fetch('http://localhost:8001/api/trading/metrics/hybrid'),
+          fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/trading/metrics/ml`),
+          fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/trading/metrics/llm`),
+          fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/trading/metrics/hybrid`),
         ])
         const [mlJson, llmJson, hybridJson] = await Promise.all([
           mlRes.json().catch(() => ({})),
@@ -220,7 +220,7 @@ function Trading() {
     let mounted = true
     const refreshModelPerformance = async () => {
       try {
-        const resp = await fetch('http://localhost:8001/api/trading/performance-summary')
+        const resp = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/trading/performance-summary`)
         const data = await resp.json().catch(() => ({}))
         if (!mounted) return
         if (resp.ok && Array.isArray(data?.models)) {
