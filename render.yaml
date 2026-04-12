@@ -24,7 +24,7 @@ services:
     staticPublishPath: dist
     envVars:
       - key: VITE_API_URL
-        value: https://direkt-backend.onrender.com
+        value: https://direkt-backend-koop.onrender.com
     routes:
       - type: rewrite
         source: /.*
