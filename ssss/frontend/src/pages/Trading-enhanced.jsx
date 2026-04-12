@@ -40,7 +40,7 @@ function Trading() {
       await startTradingSystem('llm')
       alert('LLM Trading System Started Successfully!')
     } catch (err) {
-      setError('Error connecting to LLM Trading System')
+      setError(`LLM Trading Error: ${err.message || err}`)
       console.error('LLM Trading Error:', err)
     } finally {
       setLoading(false)
@@ -58,7 +58,7 @@ function Trading() {
       await startTradingSystem('hybrid')
       alert('Hybrid Trading System Started Successfully! (ML proposes → LLM verifies)')
     } catch (err) {
-      setError('Error connecting to Hybrid Trading System')
+      setError(`Hybrid Trading Error: ${err.message || err}`)
       console.error('Hybrid Trading Error:', err)
     } finally {
       setLoading(false)
@@ -91,7 +91,7 @@ function Trading() {
       await startTradingSystem('ml')
       alert('ML Trading System Started Successfully!')
     } catch (err) {
-      setError('Error connecting to ML Trading System')
+      setError(`ML Trading Error: ${err.message || err}`)
       console.error('ML Trading Error:', err)
     } finally {
       setLoading(false)

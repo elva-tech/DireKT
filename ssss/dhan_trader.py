@@ -347,5 +347,39 @@ if __name__ == "__main__":
         positions = client.get_open_positions()
         log.info(f"\n📊 Open Positions:\n{json.dumps(positions, indent=2)}")
         
-        # Export trades
-        client.export_trades()
+        with open('session_trades.json', 'w') as f:
+            json.dump(self.trades, f, indent=4)
+        log.info(f"💾 Trade history exported ({len(self.trades)} trades)")
+
+
+class MockDhanTradingClient:
+    """Mock Dhan client for paper trading without API keys."""
+    
+    def __init__(self):
+        self.trades = []
+        log.info("🏠 Initialized Mock Dhan Trading Client")
+    
+    def place_order(self, symbol, exchange, quantity, price, side, order_type="MARKET", sl=None, target=None):
+        order_id = f"MOCK-{int(datetime.now().timestamp())}"
+        order = {
+            "order_id": order_id,
+            "symbol": symbol,
+            "exchange": exchange,
+            "quantity": quantity,
+            "price": price,
+            "side": side,
+            "status": "TRADED",
+            "timestamp": datetime.now().isoformat()
+        }
+        self.trades.append(order)
+        log.info(f"📝 MOCK ORDER PLACED: {side} {quantity} {symbol} @ ₹{price}")
+        return {"status": "success", "order_id": order_id, "data": order}
+    
+    def get_order_status(self, order_id):
+        return {"status": "TRADED"}
+
+    def get_positions(self):
+        return []
+
+    def export_trades(self):
+        pass

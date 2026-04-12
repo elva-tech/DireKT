@@ -188,7 +188,7 @@ class SilverFuturesTradingBot:
         dhan_client_id = os.getenv('DHAN_CLIENT_ID')
         
         # Validate credentials
-        missing = []
+        missing_angel = []
         for var, name in [
             (angel_client_id, 'ANGEL_ONE_CLIENT_ID'),
             (angel_client_secret, 'ANGEL_ONE_CLIENT_SECRET'),
@@ -196,24 +196,32 @@ class SilverFuturesTradingBot:
             (angel_totp, 'ANGEL_ONE_TOTP_SECRET'),
             (angel_password, 'ANGEL_ONE_PASSWORD'),
             (angel_user_id, 'ANGEL_ONE_USER_ID'),
-            (dhan_client_id, 'DHAN_CLIENT_ID'),
-            (dhan_access_token, 'DHAN_ACCESS_TOKEN')
         ]:
             if not var:
-                missing.append(name)
+                missing_angel.append(name)
         
-        if missing:
-            log.error(f"❌ Missing credentials: {', '.join(missing)}")
-            log.error("Add them to .env file. Use .env.example as template.")
-            raise RuntimeError(f"Missing credentials: {', '.join(missing)}")
+        if missing_angel:
+            log.error(f"❌ Missing Angel One credentials: {', '.join(missing_angel)}")
+            raise RuntimeError(f"Missing Angel One credentials: {', '.join(missing_angel)}")
+
+        # Dhan is optional if paper trading
+        if not dhan_client_id or not dhan_access_token:
+            if PAPER_TRADE:
+                log.warning("⚠️ Dhan credentials missing. Falling back to Mock Trading Client for paper trading.")
+                from dhan_trader import MockDhanTradingClient
+                self.dhan_client = MockDhanTradingClient()
+            else:
+                log.error("❌ Missing Dhan credentials (required for live trading).")
+                raise RuntimeError("Missing Dhan credentials (DHAN_CLIENT_ID, DHAN_ACCESS_TOKEN).")
+        else:
+            self.dhan_client = DhanTradingClient(
+                dhan_access_token, dhan_client_id, paper_trade=PAPER_TRADE
+            )
         
         # Initialize connectors
         self.angel_connector = AngelOneConnector(
             angel_client_id, angel_client_secret, angel_api_key,
             angel_totp, angel_password, angel_user_id
-        )
-        self.dhan_client = DhanTradingClient(
-            dhan_access_token, dhan_client_id, paper_trade=PAPER_TRADE
         )
         
         self.model = None
