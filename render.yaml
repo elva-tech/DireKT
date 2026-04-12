@@ -15,11 +15,12 @@ services:
         value: "" # Optional: add your external Redis URL here if needed
 
   # React Frontend Service
-  - type: static_site
+  - type: web
     name: direkt-frontend
+    env: static
     rootDir: ssss/frontend
     buildCommand: npm install && npm run build
-    publishDir: dist
+    staticPublishPath: dist
     envVars:
       - key: VITE_API_URL
         value: https://direkt-backend.onrender.com
