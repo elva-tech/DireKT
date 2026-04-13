@@ -21,6 +21,35 @@ export const useAuthStore = create((set, get) => ({
   allocationSymbolType: null,
 
   // Actions
+  register: async (credentials) => {
+    try {
+      set({ isLoading: true })
+      const response = await fetch(`${API_URL}/api/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: credentials.username,
+          password: credentials.password,
+        }),
+      })
+
+      const result = await response.json()
+      set({ isLoading: false })
+      
+      if (response.ok && result.success) {
+        return { success: true, message: result.message }
+      } else {
+        return { success: false, error: result.message || 'Registration failed' }
+      }
+    } catch (error) {
+      set({ isLoading: false })
+      console.error('Registration error:', error)
+      return { success: false, error: 'Network error or server unavailable' }
+    }
+  },
+
   login: async (credentials) => {
     try {
       set({ isLoading: true })
@@ -51,11 +80,11 @@ export const useAuthStore = create((set, get) => ({
       const tradingStrategy = credentials.tradingStrategy || get().tradingStrategy || 'ml'
 
       set({
-        user: result.user || {
-          id: 1,
-          username: credentials.username,
-          name: credentials.username.charAt(0).toUpperCase() + credentials.username.slice(1),
-          email: `${credentials.username}@mcxtrading.com`,
+        user: {
+          id: result.user.user_id,
+          username: result.user.username,
+          role: result.user.role,
+          name: result.user.username.charAt(0).toUpperCase() + result.user.username.slice(1),
         },
         sessionId: result.session_id,
         isAuthenticated: true,
@@ -67,7 +96,7 @@ export const useAuthStore = create((set, get) => ({
       localStorage.setItem('sessionId', result.session_id)
       localStorage.setItem('userBalance', String(balanceAmount))
       localStorage.setItem('tradingStrategy', String(tradingStrategy))
-      localStorage.setItem('username', String(credentials.username || 'user'))
+      localStorage.setItem('username', String(result.user.username || 'user'))
 
       try {
         await get().fetchSmartAllocation()
@@ -81,6 +110,37 @@ export const useAuthStore = create((set, get) => ({
       return { 
         success: false, 
         error: error.message || 'Login failed'
+      }
+    }
+  },
+
+  signup: async (credentials) => {
+    try {
+      set({ isLoading: true })
+      const response = await fetch(`${API_URL}/api/auth/signup`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: credentials.username,
+          password: credentials.password,
+        }),
+      })
+
+      const result = await response.json()
+      set({ isLoading: false })
+
+      if (!response.ok) {
+        return { success: false, error: result?.detail || 'Signup failed' }
+      }
+
+      return { success: true, message: result?.message }
+    } catch (error) {
+      set({ isLoading: false })
+      return { 
+        success: false, 
+        error: error.message || 'Signup failed'
       }
     }
   },

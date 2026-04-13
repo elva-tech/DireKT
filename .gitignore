@@ -29,7 +29,8 @@ logs/
 
 # Data/Models (Large files)
 *.csv
-*.pkl
+# *.pkl (Excluded by default, but we need the model)
+!best_model_random_forest_2025.pkl
 *.png
 *.jpg
 *.jpeg

@@ -1,7 +1,7 @@
 import React from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from './stores/authStore'
-import Login from './pages/Login-enhanced'
+import Login from './pages/Login'
 import Dashboard from './pages/Dashboard-enhanced'
 import TestButton from './pages/TestButton'
 import Trading from './pages/Trading-enhanced'

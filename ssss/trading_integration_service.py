@@ -29,6 +29,10 @@ from smart_allocator_external import (
     SmartAllocateRequest,
 )
 from trading_bot import SilverFuturesTradingBot
+import database
+
+# Initialize database on startup
+database.init_db()
 
 
 def _dashboard_fixed_tradingsymbol(query_override: Optional[str]) -> str:
@@ -169,6 +173,10 @@ class TradingStartRequest(BaseModel):
     max_lots: Optional[int] = None
 
 class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+class RegisterRequest(BaseModel):
     username: str
     password: str
 
@@ -392,27 +400,81 @@ async def root():
         "smart_allocator": SMART_ALLOCATOR_URL
     }
 
-@app.post("/api/auth/login")
-async def login(request: LoginRequest):
-    """Simplified login for production paper trading."""
+@app.post("/api/auth/register")
+async def register(request: RegisterRequest):
+    """Register a new user account."""
     if not request.username or not request.password:
         return {"success": False, "message": "Username and password required"}
     
-    # Paper trading accepts any admin-like credentials
-    session_id = f"sess_{uuid.uuid4().hex[:12]}"
-    user_data = {
-        "user_id": f"user_{uuid.uuid4().hex[:8]}",
-        "username": request.username,
-        "name": request.username.capitalize(),
-        "role": "trader"
-    }
+    conn = database.get_db_connection()
+    cursor = conn.cursor()
     
-    return {
-        "success": True,
-        "session_id": session_id,
-        "user": user_data,
-        "message": "Login successful"
-    }
+    try:
+        # Check if user exists
+        cursor.execute("SELECT id FROM users WHERE username = ?", (request.username,))
+        if cursor.fetchone():
+            return {"success": False, "message": "Username already exists"}
+        
+        # Create user
+        password_hash = database.hash_password(request.password)
+        cursor.execute(
+            "INSERT INTO users (username, password_hash) VALUES (?, ?)",
+            (request.username, password_hash)
+        )
+        user_id = cursor.lastrowid
+        
+        # Create profile
+        cursor.execute(
+            "INSERT INTO user_profiles (user_id) VALUES (?)",
+            (user_id,)
+        )
+        
+        conn.commit()
+        return {"success": True, "message": "Account created successfully. Please login."}
+    except Exception as e:
+        conn.rollback()
+        return {"success": False, "message": f"Registration failed: {str(e)}"}
+    finally:
+        conn.close()
+
+@app.post("/api/auth/login")
+async def login(request: LoginRequest):
+    """Authenticate user against database."""
+    if not request.username or not request.password:
+        return {"success": False, "message": "Username and password required"}
+    
+    conn = database.get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute("SELECT id, username, password_hash, role FROM users WHERE username = ?", (request.username,))
+        user_row = cursor.fetchone()
+        
+        if not user_row or not database.verify_password(request.password, user_row["password_hash"]):
+            return {"success": False, "message": "Invalid username or password"}
+        
+        # Fetch profile
+        cursor.execute("SELECT balance FROM user_profiles WHERE user_id = ?", (user_row["id"],))
+        profile_row = cursor.fetchone()
+        balance = profile_row["balance"] if profile_row else 100000.0
+        
+        session_id = f"sess_{uuid.uuid4().hex[:12]}"
+        user_data = {
+            "user_id": user_row["id"],
+            "username": user_row["username"],
+            "name": user_row["username"].capitalize(),
+            "role": user_row["role"],
+            "balance": balance
+        }
+        
+        return {
+            "success": True,
+            "session_id": session_id,
+            "user": user_data,
+            "message": "Login successful"
+        }
+    finally:
+        conn.close()
 
 @app.get("/health")
 async def health():

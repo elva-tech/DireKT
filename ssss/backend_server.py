@@ -42,6 +42,9 @@ from enhanced_trading_bot import EnhancedTradingBot
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Import database helper
+from database import get_db_connection, verify_password, hash_password, init_db
+
 # Configuration
 REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379')
 SECRET_KEY = os.getenv('SECRET_KEY', 'your-secret-key-change-in-production')
@@ -54,6 +57,10 @@ CORS_ORIGINS = [
 
 # Pydantic models for API
 class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+class SignupRequest(BaseModel):
     username: str
     password: str
 
@@ -163,6 +170,7 @@ connection_manager = ConnectionManager()
 async def lifespan(app: FastAPI):
     # Startup
     logger.info("🚀 MCX Trading Web Backend starting up...")
+    init_db() # Initialize database tables
     yield
     # Shutdown
     logger.info("🛑 MCX Trading Web Backend shutting down...")
@@ -210,31 +218,90 @@ async def root():
         "timestamp": datetime.now().isoformat()
     }
 
+@app.post("/api/auth/signup")
+async def signup(request: SignupRequest):
+    """Register a new user."""
+    if not request.username or not request.password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Username and password are required"
+        )
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        # Check if user exists
+        cursor.execute("SELECT id FROM users WHERE username = ?", (request.username,))
+        if cursor.fetchone():
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Username already exists"
+            )
+        
+        # Create user
+        hashed = hash_password(request.password)
+        cursor.execute(
+            "INSERT INTO users (username, password_hash) VALUES (?, ?)",
+            (request.username, hashed)
+        )
+        user_id = cursor.lastrowid
+        
+        # Create profile
+        cursor.execute(
+            "INSERT INTO user_profiles (user_id) VALUES (?)",
+            (user_id,)
+        )
+        
+        conn.commit()
+        return {"success": True, "message": "User created successfully"}
+    except Exception as e:
+        conn.rollback()
+        logger.error(f"Signup error: {e}")
+        if isinstance(e, HTTPException):
+            raise e
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Internal server error"
+        )
+    finally:
+        conn.close()
+
 @app.post("/api/auth/login")
 async def login(request: LoginRequest):
     """Authenticate user and create session."""
-    # Paper-first auth: accept any non-empty username/password and create an in-memory session.
-    # (No real trading credentials are verified here.)
-    if not request.username or not request.password:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid credentials",
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute(
+            "SELECT id, username, password_hash, role FROM users WHERE username = ?",
+            (request.username,)
         )
+        user = cursor.fetchone()
+        
+        if not user or not verify_password(request.password, user["password_hash"]):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid username or password",
+            )
 
-    user_data = {
-        "user_id": f"user_{uuid.uuid4().hex[:8]}",
-        "username": request.username,
-        "role": "paper_user",
-    }
+        user_data = {
+            "user_id": user["id"],
+            "username": user["username"],
+            "role": user["role"],
+        }
 
-    session_id = session_manager.create_session(user_data)
+        session_id = session_manager.create_session(user_data)
 
-    return {
-        "success": True,
-        "session_id": session_id,
-        "user": user_data,
-        "message": "Login successful",
-    }
+        return {
+            "success": True,
+            "session_id": session_id,
+            "user": user_data,
+            "message": "Login successful",
+        }
+    finally:
+        conn.close()
 
 @app.post("/api/auth/logout")
 async def logout(
