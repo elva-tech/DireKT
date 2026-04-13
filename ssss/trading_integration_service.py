@@ -31,8 +31,11 @@ from smart_allocator_external import (
 from trading_bot import SilverFuturesTradingBot
 import database
 
-# Initialize database on startup
-database.init_db()
+# Initialize database on startup (safe wrapper)
+try:
+    database.init_db()
+except Exception as e:
+    print(f"🚨 Database init warning: {e}")
 
 
 def _dashboard_fixed_tradingsymbol(query_override: Optional[str]) -> str:
@@ -456,7 +459,10 @@ async def login(request: LoginRequest):
         # Fetch profile
         cursor.execute("SELECT balance FROM user_profiles WHERE user_id = ?", (user_row["id"],))
         profile_row = cursor.fetchone()
-        balance = profile_row["balance"] if profile_row else 100000.0
+        
+        balance = 100000.0
+        if profile_row and profile_row["balance"]:
+            balance = float(profile_row["balance"])
         
         session_id = f"sess_{uuid.uuid4().hex[:12]}"
         user_data = {

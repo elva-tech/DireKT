@@ -340,9 +340,9 @@ const Login = () => {
             </div>
           )}
 
-          {!isRegister && (
+          {isRegister && (
             <div style={styles.inputGroup}>
-              <label style={styles.label}>Initial Balance (₹)</label>
+              <label style={styles.label}>Initial Balance for Paper Trading (₹)</label>
               <div style={styles.inputWrapper}>
                 <span style={styles.icon}>💰</span>
                 <input 
