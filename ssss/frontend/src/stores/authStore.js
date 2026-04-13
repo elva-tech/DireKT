@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_URL = import.meta.env.VITE_API_URL || 'https://direkt-backend.onrender.com';
 
 export const useAuthStore = create((set, get) => ({
   // State
@@ -32,6 +32,7 @@ export const useAuthStore = create((set, get) => ({
         body: JSON.stringify({
           username: credentials.username,
           password: credentials.password,
+          balance: credentials.balance || 100000.0
         }),
       })
 
