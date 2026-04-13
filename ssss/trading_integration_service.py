@@ -7,15 +7,38 @@ import os
 import copy
 import time
 from datetime import datetime, timezone
+import logging
+import json
+import uuid
+import threading
+from typing import Optional
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import requests
-import json
-import uuid
-from typing import Optional
-import threading
+
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+app = FastAPI(
+    title="DireKT Trading Platform API Official",
+    description="Consolidated Integration Service",
+    version="1.1.0"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+    allow_credentials=True,
+)
+
+@app.get("/")
+async def root_check():
+    return {"status": "online", "service": "DireKT Backend", "version": "1.1.0"}
 
 from smart_allocator_external import (
     fetch_full_quote,
@@ -150,18 +173,8 @@ def _quote_snapshot(token: str, tradingsymbol: str, quotes: dict) -> dict:
         "as_of": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
     }
 
-app = FastAPI(
-    title="MCX Trading Integration",
-    description="Integration service for Smart Allocator and Trading Systems",
-    version="1.0.0",
-)
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+# FastAPI app is already initialized at the top.
+# Removed duplicate initialization here.
 
 # ============================================================================
 # PYDANTIC MODELS
@@ -396,8 +409,13 @@ def start_trading_bot(
 # API ROUTES
 # ============================================================================
 
-@app.get("/")
-async def root():
+@app.get("/api/v1/ping")
+async def ping():
+    return {"ping": "pong", "timestamp": datetime.now().isoformat()}
+
+# The old root route is redundant but kept for compatibility.
+@app.get("/api/info")
+async def info():
     return {
         "message": "MCX Trading Integration Service",
         "systems": list(trading_systems.keys()),
