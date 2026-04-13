@@ -182,6 +182,7 @@ class LoginRequest(BaseModel):
 class RegisterRequest(BaseModel):
     username: str
     password: str
+    balance: Optional[float] = 100000.0
 
 class TradingStatusResponse(BaseModel):
     status: bool
@@ -428,12 +429,12 @@ async def register(request: RegisterRequest):
         
         # Create profile
         cursor.execute(
-            "INSERT INTO user_profiles (user_id) VALUES (?)",
-            (user_id,)
+            "INSERT INTO user_profiles (user_id, balance) VALUES (?, ?)",
+            (user_id, request.balance if request.balance is not None else 100000.0)
         )
         
         conn.commit()
-        return {"success": True, "message": "Account created successfully. Please login."}
+        return {"success": True, "message": "Account created successfully"}
     except Exception as e:
         conn.rollback()
         return {"success": False, "message": f"Registration failed: {str(e)}"}

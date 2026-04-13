@@ -40,22 +40,34 @@ const Login = () => {
 
     if (isRegister) {
       if (credentials.password !== credentials.confirmPassword) {
-        setError("Passwords do not match")
+        setError("Passwords do not match");
         setIsLoading(false)
-        return
+        return;
       }
       
       const res = await register({
         username: credentials.username,
-        password: credentials.password
-      })
+        password: credentials.password,
+        balance: parseFloat(credentials.balanceAmount) || 100000
+      });
       
       if (res.success) {
-        setSuccess(res.message)
-        setIsRegister(false)
-        setCredentials(prev => ({ ...prev, password: '', confirmPassword: '' }))
+        // Auto-login after successful registration
+        const loginRes = await login({
+          username: credentials.username,
+          password: credentials.password,
+          balanceAmount: parseFloat(credentials.balanceAmount) || 100000
+        });
+        
+        if (loginRes.success) {
+          navigate('/dashboard');
+        } else {
+          setError("Account created, but auto-login failed. Please sign in manually.");
+          setIsRegister(false);
+          setCredentials(prev => ({ ...prev, password: '', confirmPassword: '' }));
+        }
       } else {
-        setError(res.error)
+        setError(res.error || "Registration failed");
       }
     } else {
       const res = await login({
