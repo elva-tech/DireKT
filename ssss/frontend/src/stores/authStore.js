@@ -1,10 +1,11 @@
 import { create } from 'zustand'
 
 // Resilient API URL selection with multiple fallbacks
-const API_URL = import.meta.env.VITE_API_URL || 
+const raw_api_url = import.meta.env.VITE_API_URL || 
                 'https://direkt-backend-koop.onrender.com' || 
                 'https://direkt-backend.onrender.com' ||
                 'http://localhost:8000';
+const API_URL = raw_api_url.replace(/\/$/, '');
 
 export const useAuthStore = create((set, get) => ({
   // State

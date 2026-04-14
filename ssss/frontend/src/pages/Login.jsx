@@ -38,12 +38,13 @@ const Login = () => {
     const checkHealth = async () => {
       try {
         // We use the same API_URL logic as the store
-        const API_URL = import.meta.env.VITE_API_URL || 
+        const raw_api_url = import.meta.env.VITE_API_URL || 
                         'https://direkt-backend-koop.onrender.com' || 
                         'https://direkt-backend.onrender.com' ||
                         'http://localhost:8000';
+        const API_URL = raw_api_url.replace(/\/$/, '');
         
-        const response = await fetch(`${API_URL}/api/v1/ping`);
+        const response = await fetch(`${API_URL}/health`);
         if (response.ok) {
           setBackendStatus('online');
         } else {
