@@ -14,6 +14,7 @@ const Login = () => {
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(null)
   const [showPassword, setShowPassword] = useState(false)
+  const [backendStatus, setBackendStatus] = useState('checking') // 'checking', 'online', 'offline'
   
   const navigate = useNavigate()
   const { login, register } = useAuthStore()
@@ -31,6 +32,29 @@ const Login = () => {
     window.addEventListener('mousemove', handleMouseMove)
     return () => window.removeEventListener('mousemove', handleMouseMove)
   }, [])
+
+  // Check backend health
+  useEffect(() => {
+    const checkHealth = async () => {
+      try {
+        // We use the same API_URL logic as the store
+        const API_URL = import.meta.env.VITE_API_URL || 
+                        'https://direkt-backend-koop.onrender.com' || 
+                        'https://direkt-backend.onrender.com' ||
+                        'http://localhost:8000';
+        
+        const response = await fetch(`${API_URL}/api/v1/ping`);
+        if (response.ok) {
+          setBackendStatus('online');
+        } else {
+          setBackendStatus('offline');
+        }
+      } catch (e) {
+        setBackendStatus('offline');
+      }
+    };
+    checkHealth();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -282,6 +306,33 @@ const Login = () => {
       
       <div style={styles.backgroundGlow} />
       <div style={styles.accentGlow} />
+
+      {/* Connection Indicator */}
+      <div style={{
+        position: 'fixed',
+        bottom: '20px',
+        right: '20px',
+        padding: '8px 12px',
+        background: 'rgba(15, 23, 42, 0.8)',
+        borderRadius: '20px',
+        border: '1px solid rgba(255, 255, 255, 0.1)',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '8px',
+        fontSize: '12px',
+        color: '#94a3b8',
+        zIndex: 1000,
+        backdropFilter: 'blur(8px)',
+      }}>
+        <div style={{
+          width: '8px',
+          height: '8px',
+          borderRadius: '50%',
+          background: backendStatus === 'online' ? '#22c55e' : backendStatus === 'offline' ? '#ef4444' : '#f59e0b',
+          boxShadow: `0 0 10px ${backendStatus === 'online' ? '#22c55e' : backendStatus === 'offline' ? '#ef4444' : '#f59e0b'}`,
+        }} />
+        Server: {backendStatus === 'online' ? 'Connected' : backendStatus === 'offline' ? 'Disconnected' : 'Checking...'}
+      </div>
 
       <div style={styles.card}>
         <div style={styles.header}>
