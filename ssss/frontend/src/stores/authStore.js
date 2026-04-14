@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-const API_URL = import.meta.env.VITE_API_URL || 'https://direkt-backend.onrender.com';
+const API_URL = import.meta.env.VITE_API_URL || 'https://direkt-backend-koop.onrender.com';
 
 export const useAuthStore = create((set, get) => ({
   // State
