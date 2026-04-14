@@ -16,7 +16,7 @@ services:
         value: "" # Optional: add your external Redis URL here if needed
 
   # React Frontend Service
-  - type: web
+  - type: static_site
     name: direkt-frontend
     env: static
     rootDir: ssss/frontend

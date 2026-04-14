@@ -11,7 +11,7 @@ export const useAuthStore = create((set, get) => ({
   user: null,
   sessionId: null,
   isAuthenticated: false,
-  isLoading: false,
+  isLoading: true,
   balanceAmount: 100000,
   tradingStrategy: 'ml',
   tradingSystemActive: false,
