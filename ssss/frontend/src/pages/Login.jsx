@@ -105,11 +105,11 @@ const Login = () => {
         console.log("Login success, navigating to dashboard...");
         navigate('/dashboard');
         
-        // Fallback: if we haven't unmounted in 1s, force a reload to /dashboard
+        // Fallback: if we haven't unmounted in 1s, force a reload to dashboard hash
         setTimeout(() => {
-          if (window.location.pathname !== '/dashboard') {
-            console.log("Internal navigation might have failed, forcing hard redirect...");
-            window.location.href = '/dashboard';
+          if (!window.location.hash.includes('dashboard')) {
+            console.log("Internal navigation might have failed, forcing hash redirect...");
+            window.location.href = '/#/dashboard';
           }
         }, 1000);
       } else {
