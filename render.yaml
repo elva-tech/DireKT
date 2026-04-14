@@ -27,5 +27,5 @@ services:
         value: https://direkt-backend-koop.onrender.com
     routes:
       - type: rewrite
-        source: /.*
+        source: /*
         destination: /index.html

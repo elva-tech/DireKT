@@ -101,9 +101,18 @@ const Login = () => {
       })
       
       if (res.success) {
-        navigate('/dashboard')
+        console.log("Login success, navigating to dashboard...");
+        navigate('/dashboard');
+        
+        // Fallback: if we haven't unmounted in 1s, force a reload to /dashboard
+        setTimeout(() => {
+          if (window.location.pathname !== '/dashboard') {
+            console.log("Internal navigation might have failed, forcing hard redirect...");
+            window.location.href = '/dashboard';
+          }
+        }, 1000);
       } else {
-        setError(res.error)
+        setError(res.error);
       }
     }
     
