@@ -2,6 +2,16 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../stores/authStore'
 
+const API_CANDIDATES = [
+  import.meta.env.VITE_API_URL,
+  'https://direkt-backend-koop.onrender.com',
+  'https://direkt-backend.onrender.com',
+  'http://localhost:8000',
+]
+  .filter(Boolean)
+  .map((u) => String(u).replace(/\/$/, ''))
+  .filter((u, i, arr) => arr.indexOf(u) === i)
+
 const Login = () => {
   const [isRegister, setIsRegister] = useState(false)
   const [credentials, setCredentials] = useState({
@@ -37,19 +47,20 @@ const Login = () => {
   useEffect(() => {
     const checkHealth = async () => {
       try {
-        // We use the same API_URL logic as the store
-        const raw_api_url = import.meta.env.VITE_API_URL || 
-                        'https://direkt-backend-koop.onrender.com' || 
-                        'https://direkt-backend.onrender.com' ||
-                        'http://localhost:8000';
-        const API_URL = raw_api_url.replace(/\/$/, '');
-        
-        const response = await fetch(`${API_URL}/health`);
-        if (response.ok) {
-          setBackendStatus('online');
-        } else {
-          setBackendStatus('offline');
+        let online = false
+        for (const base of API_CANDIDATES) {
+          try {
+            const controller = new AbortController()
+            const timeoutId = window.setTimeout(() => controller.abort(), 8000)
+            const response = await fetch(`${base}/health`, { signal: controller.signal })
+            window.clearTimeout(timeoutId)
+            if (response.ok) {
+              online = true
+              break
+            }
+          } catch (_) {}
         }
+        setBackendStatus(online ? 'online' : 'offline')
       } catch (e) {
         setBackendStatus('offline');
       }

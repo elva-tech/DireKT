@@ -1,11 +1,34 @@
 import { create } from 'zustand'
 
-// Resilient API URL selection with multiple fallbacks
-const raw_api_url = import.meta.env.VITE_API_URL || 
-                'https://direkt-backend-koop.onrender.com' || 
-                'https://direkt-backend.onrender.com' ||
-                'http://localhost:8000';
-const API_URL = raw_api_url.replace(/\/$/, '');
+const API_CANDIDATES = [
+  import.meta.env.VITE_API_URL,
+  'https://direkt-backend-koop.onrender.com',
+  'https://direkt-backend.onrender.com',
+  'http://localhost:8000',
+]
+  .filter(Boolean)
+  .map((u) => String(u).replace(/\/$/, ''))
+  .filter((u, i, arr) => arr.indexOf(u) === i)
+
+async function fetchWithApiFallback(path, options = {}) {
+  let lastError = null
+  for (const base of API_CANDIDATES) {
+    const controller = new AbortController()
+    const timeoutId = window.setTimeout(() => controller.abort(), 12000)
+    try {
+      const response = await fetch(`${base}${path}`, {
+        ...options,
+        signal: controller.signal,
+      })
+      window.clearTimeout(timeoutId)
+      return { response, base }
+    } catch (error) {
+      window.clearTimeout(timeoutId)
+      lastError = error
+    }
+  }
+  throw lastError || new Error('All backend URLs failed')
+}
 
 export const useAuthStore = create((set, get) => ({
   // State
@@ -29,7 +52,7 @@ export const useAuthStore = create((set, get) => ({
   register: async (credentials) => {
     try {
       set({ isLoading: true })
-      const response = await fetch(`${API_URL}/api/auth/register`, {
+      const { response } = await fetchWithApiFallback('/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -59,7 +82,7 @@ export const useAuthStore = create((set, get) => ({
   login: async (credentials) => {
     try {
       set({ isLoading: true })
-      const response = await fetch(`${API_URL}/api/auth/login`, {
+      const { response } = await fetchWithApiFallback('/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -157,7 +180,7 @@ export const useAuthStore = create((set, get) => ({
       const { tradingSystemActive } = get()
       if (tradingSystemActive) {
         try {
-          await fetch(`${API_URL}/api/trading/stop/ml`, {
+          await fetchWithApiFallback('/api/trading/stop/ml', {
             method: 'POST'
           })
         } catch (err) {
@@ -165,7 +188,7 @@ export const useAuthStore = create((set, get) => ({
         }
         
         try {
-          await fetch(`${API_URL}/api/trading/stop/llm`, {
+          await fetchWithApiFallback('/api/trading/stop/llm', {
             method: 'POST'
           })
         } catch (err) {
@@ -173,7 +196,7 @@ export const useAuthStore = create((set, get) => ({
         }
 
         try {
-          await fetch(`${API_URL}/api/trading/stop/hybrid`, {
+          await fetchWithApiFallback('/api/trading/stop/hybrid', {
             method: 'POST'
           })
         } catch (err) {
@@ -270,7 +293,7 @@ export const useAuthStore = create((set, get) => ({
     try {
       const { balanceAmount } = get()
       // Use integration service as a stable gateway to allocator.
-      const response = await fetch(`${API_URL}/api/allocation/${balanceAmount}`)
+      const { response } = await fetchWithApiFallback(`/api/allocation/${balanceAmount}`)
       const result = await response.json().catch(() => ({}))
 
       if (!response.ok) {
@@ -317,7 +340,7 @@ export const useAuthStore = create((set, get) => ({
       } = get()
       const maxLots = Number(lotAllocation?.buy_orders?.[0]?.lots || lotAllocation?.summary?.total_lots || 0)
       
-      const response = await fetch(`${API_URL}/api/trading/start`, {
+      const { response } = await fetchWithApiFallback('/api/trading/start', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -353,7 +376,7 @@ export const useAuthStore = create((set, get) => ({
 
   stopTradingSystem: async (strategy) => {
     try {
-      const response = await fetch(`${API_URL}/api/trading/stop/${strategy}`, {
+      const { response } = await fetchWithApiFallback(`/api/trading/stop/${strategy}`, {
         method: 'POST'
       })
       
@@ -380,7 +403,7 @@ export const useAuthStore = create((set, get) => ({
   },
 
   emergencyExitTradingSystem: async (strategy) => {
-    const response = await fetch(`${API_URL}/api/trading/emergency-exit/${strategy}`, {
+    const { response } = await fetchWithApiFallback(`/api/trading/emergency-exit/${strategy}`, {
       method: 'POST'
     })
     const result = await response.json()
@@ -391,7 +414,7 @@ export const useAuthStore = create((set, get) => ({
   },
 
   manualResetTradingSystem: async (strategy) => {
-    const response = await fetch(`${API_URL}/api/trading/manual-reset/${strategy}`, {
+    const { response } = await fetchWithApiFallback(`/api/trading/manual-reset/${strategy}`, {
       method: 'POST'
     })
     const result = await response.json()
@@ -403,7 +426,7 @@ export const useAuthStore = create((set, get) => ({
 
   getTradingSystemStatus: async (strategy) => {
     try {
-      const response = await fetch(`${API_URL}/api/trading/status/${strategy}`)
+      const { response } = await fetchWithApiFallback(`/api/trading/status/${strategy}`)
       const result = await response.json()
       const active = Boolean(result?.active)
       if (strategy === 'ml') {
