@@ -10,7 +10,6 @@ import Orders from './pages/Orders'
 import Settings from './pages/Settings'
 import History from './pages/History'
 import Layout from './components/Layout-enhanced'
-import LoadingSpinner from './components/LoadingSpinner'
 
 function App() {
   const { isAuthenticated, isLoading, initializeAuth } = useAuthStore()
@@ -69,26 +68,19 @@ function App() {
           path="/login" 
           element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" replace />} 
         />
+        <Route element={isAuthenticated ? <Layout /> : <Navigate to="/login" replace />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/test" element={<TestButton />} />
+          <Route path="/trading" element={<Trading />} />
+          <Route path="/history" element={<History />} />
+          <Route path="/portfolio" element={<Portfolio />} />
+          <Route path="/orders" element={<Orders />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        </Route>
         <Route
-          path="/*"
-          element={
-            isAuthenticated ? (
-              <Layout>
-                <Routes>
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/test" element={<TestButton />} />
-                  <Route path="/trading" element={<Trading />} />
-                  <Route path="/history" element={<History />} />
-                  <Route path="/portfolio" element={<Portfolio />} />
-                  <Route path="/orders" element={<Orders />} />
-                  <Route path="/settings" element={<Settings />} />
-                  <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                </Routes>
-              </Layout>
-            ) : (
-              <Navigate to="/login" replace />
-            )
-          }
+          path="*"
+          element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />}
         />
       </Routes>
     </div>

@@ -85,7 +85,7 @@ const Login = () => {
         });
         
         if (loginRes.success) {
-          navigate('/dashboard');
+          navigate('/dashboard', { replace: true });
         } else {
           setError("Account created, but auto-login failed. Please sign in manually.");
           setIsRegister(false);
@@ -102,16 +102,7 @@ const Login = () => {
       })
       
       if (res.success) {
-        console.log("Login success, navigating to dashboard...");
-        navigate('/dashboard');
-        
-        // Fallback: if we haven't unmounted in 1s, force a reload to dashboard hash
-        setTimeout(() => {
-          if (!window.location.hash.includes('dashboard')) {
-            console.log("Internal navigation might have failed, forcing hash redirect...");
-            window.location.href = '/#/dashboard';
-          }
-        }, 1000);
+        navigate('/dashboard', { replace: true });
       } else {
         setError(res.error);
       }
