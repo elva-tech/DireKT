@@ -17,7 +17,7 @@ const Login = () => {
   const [backendStatus, setBackendStatus] = useState('checking') // 'checking', 'online', 'offline'
   
   const navigate = useNavigate()
-  const { login, register } = useAuthStore()
+  const { login, register, isAuthenticated } = useAuthStore()
 
   // Background animation state
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
@@ -56,6 +56,12 @@ const Login = () => {
     };
     checkHealth();
   }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard', { replace: true })
+    }
+  }, [isAuthenticated, navigate])
 
   const handleSubmit = async (e) => {
     e.preventDefault()

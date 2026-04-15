@@ -11,6 +11,13 @@ import Settings from './pages/Settings'
 import History from './pages/History'
 import Layout from './components/Layout-enhanced'
 
+function ProtectedPage({ isAuthenticated, children }) {
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />
+  }
+  return <Layout>{children}</Layout>
+}
+
 function App() {
   const { isAuthenticated, isLoading, initializeAuth } = useAuthStore()
 
@@ -68,16 +75,63 @@ function App() {
           path="/login" 
           element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" replace />} 
         />
-        <Route element={isAuthenticated ? <Layout /> : <Navigate to="/login" replace />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/test" element={<TestButton />} />
-          <Route path="/trading" element={<Trading />} />
-          <Route path="/history" element={<History />} />
-          <Route path="/portfolio" element={<Portfolio />} />
-          <Route path="/orders" element={<Orders />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        </Route>
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedPage isAuthenticated={isAuthenticated}>
+              <Dashboard />
+            </ProtectedPage>
+          }
+        />
+        <Route
+          path="/test"
+          element={
+            <ProtectedPage isAuthenticated={isAuthenticated}>
+              <TestButton />
+            </ProtectedPage>
+          }
+        />
+        <Route
+          path="/trading"
+          element={
+            <ProtectedPage isAuthenticated={isAuthenticated}>
+              <Trading />
+            </ProtectedPage>
+          }
+        />
+        <Route
+          path="/history"
+          element={
+            <ProtectedPage isAuthenticated={isAuthenticated}>
+              <History />
+            </ProtectedPage>
+          }
+        />
+        <Route
+          path="/portfolio"
+          element={
+            <ProtectedPage isAuthenticated={isAuthenticated}>
+              <Portfolio />
+            </ProtectedPage>
+          }
+        />
+        <Route
+          path="/orders"
+          element={
+            <ProtectedPage isAuthenticated={isAuthenticated}>
+              <Orders />
+            </ProtectedPage>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <ProtectedPage isAuthenticated={isAuthenticated}>
+              <Settings />
+            </ProtectedPage>
+          }
+        />
+        <Route path="/" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />} />
         <Route
           path="*"
           element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />}
