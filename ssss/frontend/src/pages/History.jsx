@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import { useAuthStore } from '../stores/authStore'
 
-const INTEGRATION_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+const raw_api_url = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+const INTEGRATION_BASE = raw_api_url.replace(/\/$/, '')
 
 function fmtPrice(v) {
   if (v === undefined || v === null || v === '') return '—'

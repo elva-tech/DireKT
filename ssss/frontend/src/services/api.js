@@ -1,7 +1,8 @@
 import axios from 'axios'
 import toast from 'react-hot-toast'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+const raw_api_url = import.meta.env.VITE_API_URL || 'http://localhost:8000'
+const API_BASE_URL = raw_api_url.replace(/\/$/, '')
 
 // Create axios instance
 const api = axios.create({
