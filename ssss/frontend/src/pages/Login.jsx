@@ -108,7 +108,7 @@ const Login = () => {
       })
       
       if (res.success) {
-        navigate('/dashboard', { replace: true });
+        window.location.replace('/dashboard');
       } else {
         setError(res.error);
       }

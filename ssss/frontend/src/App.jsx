@@ -20,6 +20,8 @@ function ProtectedPage({ isAuthenticated, children }) {
 
 function App() {
   const { isAuthenticated, isLoading, initializeAuth } = useAuthStore()
+  const hasStoredSession = Boolean(localStorage.getItem('sessionId'))
+  const isUserAuthenticated = isAuthenticated || hasStoredSession
 
   // Initialize auth on app mount
   React.useEffect(() => {
@@ -73,12 +75,12 @@ function App() {
       <Routes>
         <Route 
           path="/login" 
-          element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" replace />} 
+          element={!isUserAuthenticated ? <Login /> : <Navigate to="/dashboard" replace />} 
         />
         <Route
           path="/dashboard"
           element={
-            <ProtectedPage isAuthenticated={isAuthenticated}>
+            <ProtectedPage isAuthenticated={isUserAuthenticated}>
               <Dashboard />
             </ProtectedPage>
           }
@@ -86,7 +88,7 @@ function App() {
         <Route
           path="/test"
           element={
-            <ProtectedPage isAuthenticated={isAuthenticated}>
+            <ProtectedPage isAuthenticated={isUserAuthenticated}>
               <TestButton />
             </ProtectedPage>
           }
@@ -94,7 +96,7 @@ function App() {
         <Route
           path="/trading"
           element={
-            <ProtectedPage isAuthenticated={isAuthenticated}>
+            <ProtectedPage isAuthenticated={isUserAuthenticated}>
               <Trading />
             </ProtectedPage>
           }
@@ -102,7 +104,7 @@ function App() {
         <Route
           path="/history"
           element={
-            <ProtectedPage isAuthenticated={isAuthenticated}>
+            <ProtectedPage isAuthenticated={isUserAuthenticated}>
               <History />
             </ProtectedPage>
           }
@@ -110,7 +112,7 @@ function App() {
         <Route
           path="/portfolio"
           element={
-            <ProtectedPage isAuthenticated={isAuthenticated}>
+            <ProtectedPage isAuthenticated={isUserAuthenticated}>
               <Portfolio />
             </ProtectedPage>
           }
@@ -118,7 +120,7 @@ function App() {
         <Route
           path="/orders"
           element={
-            <ProtectedPage isAuthenticated={isAuthenticated}>
+            <ProtectedPage isAuthenticated={isUserAuthenticated}>
               <Orders />
             </ProtectedPage>
           }
@@ -126,15 +128,15 @@ function App() {
         <Route
           path="/settings"
           element={
-            <ProtectedPage isAuthenticated={isAuthenticated}>
+            <ProtectedPage isAuthenticated={isUserAuthenticated}>
               <Settings />
             </ProtectedPage>
           }
         />
-        <Route path="/" element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />} />
+        <Route path="/" element={<Navigate to={isUserAuthenticated ? "/dashboard" : "/login"} replace />} />
         <Route
           path="*"
-          element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />}
+          element={<Navigate to={isUserAuthenticated ? "/dashboard" : "/login"} replace />}
         />
       </Routes>
     </div>
