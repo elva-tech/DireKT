@@ -1,0 +1,28 @@
+[
+  {
+    "order_id": "PAPER_20260417180353",
+    "symbol": "SILVERMIC30APR26FUT",
+    "exchange": "MCX",
+    "quantity": 2,
+    "price": 253816.0,
+    "side": "BUY",
+    "order_type": "MARKET",
+    "status": "TRADED",
+    "timestamp": "2026-04-17T18:03:53.308974",
+    "sl_price": 250008.76,
+    "target_price": 256861.79200000002
+  },
+  {
+    "order_id": "PAPER_20260417180444",
+    "symbol": "SILVERMIC30APR26FUT",
+    "exchange": "MCX",
+    "quantity": 2,
+    "price": 253820.0,
+    "side": "SELL",
+    "order_type": "MARKET",
+    "status": "TRADED",
+    "timestamp": "2026-04-17T18:04:44.322042",
+    "sl_price": null,
+    "target_price": null
+  }
+]

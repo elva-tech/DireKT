@@ -1,0 +1,10 @@
+Data extension successful
+Total records: 1348
+Date range: 2020-01-01 - 2025-02-28
+Price range: 59688.00 - 185617.31
+
+Model Metrics:
+Accuracy: 97.1%
+Precision: 95.6%
+Recall: 99.1%
+Model saved: best_model_random_forest_2025.pkl

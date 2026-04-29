@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frontend Test</title>
+</head>
+<body style="background: #0f172a; color: white; font-family: Arial; padding: 20px;">
+    <h1>🚀 Testing Frontend Access</h1>
+    
+    <div id="results"></div>
+    
+    <script>
+        async function testFrontend() {
+            const results = document.getElementById('results');
+            
+            try {
+                // Test if we can reach the frontend
+                const response = await fetch('http://localhost:3000/');
+                const text = await response.text();
+                
+                results.innerHTML = `
+                    <div style="background: #22c55e; padding: 10px; margin: 10px 0; border-radius: 5px;">
+                        ✅ Frontend is reachable! Status: ${response.status}
+                    </div>
+                    <div style="background: #3b82f6; padding: 10px; margin: 10px 0; border-radius: 5px;">
+                        📄 Response length: ${text.length} characters
+                    </div>
+                    <button onclick="window.open('http://localhost:3000', '_blank')" 
+                            style="padding: 10px 20px; background: #22c55e; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        Open Frontend in New Tab
+                    </button>
+                `;
+            } catch (error) {
+                results.innerHTML = `
+                    <div style="background: #ef4444; padding: 10px; margin: 10px 0; border-radius: 5px;">
+                        ❌ Error accessing frontend: ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        // Test on load
+        window.onload = testFrontend;
+    </script>
+</body>
+</html>

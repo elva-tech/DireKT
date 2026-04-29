@@ -1,0 +1,40 @@
+# 🔐 Credentials & Environment
+.env
+.env.local
+.env.*.local
+credentials.json
+api_keys.txt
+
+# 📊 Data & Logs
+*.log
+logs/
+trading_bot.log
+trade_history.json
+signal_cache.json
+
+# 🐍 Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# 💾 Database & State
+*.db
+*.sqlite
+cache/
+
+# 📁 IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 🌐 OS
+.DS_Store
+Thumbs.db

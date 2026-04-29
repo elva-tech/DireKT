@@ -1,0 +1,226 @@
+[
+  {
+    "timestamp": "2026-04-17T18:03:51.101149",
+    "price": 253816.0,
+    "volume": 0,
+    "oi": 0,
+    "confidence": 0.7387707383940257,
+    "action": "BUY"
+  },
+  {
+    "timestamp": "2026-04-17T18:03:53.305269",
+    "price": 253816.0,
+    "volume": 0,
+    "oi": 0,
+    "confidence": 0.7312066358299231,
+    "action": "BUY"
+  },
+  {
+    "timestamp": "2026-04-17T18:03:55.520342",
+    "price": 253816.0,
+    "volume": 0,
+    "oi": 0,
+    "confidence": 0.7312066358299231,
+    "action": "BUY"
+  },
+  {
+    "timestamp": "2026-04-17T18:03:57.717743",
+    "price": 253861.0,
+    "volume": 0,
+    "oi": 0,
+    "confidence": 0.7326352072584947,
+    "action": "BUY"
+  },
+  {
+    "timestamp": "2026-04-17T18:03:59.924140",
+    "price": 253861.0,
+    "volume": 0,
+    "oi": 0,
+    "confidence": 0.7306352072584947,
+    "action": "BUY"
+  },
+  {
+    "timestamp": "2026-04-17T18:04:02.135957",
+    "price": 253858.0,
+    "volume": 0,
+    "oi": 0,
+    "confidence": 0.7306352072584944,
+    "action": "BUY"
+  },
+  {
+    "timestamp": "2026-04-17T18:04:04.538239",
+    "price": 253858.0,
+    "volume": 0,
+    "oi": 0,
+    "confidence": 0.7306352072584944,
+    "action": "BUY"
+  },
+  {
+    "timestamp": "2026-04-17T18:04:06.773464",
+    "price": 253858.0,
+    "volume": 0,
+    "oi": 0,
+    "confidence": 0.7326352072584946,
+    "action": "BUY"
+  },
+  {
+    "timestamp": "2026-04-17T18:04:08.960338",
+    "price": 253850.0,
+    "volume": 0,
+    "oi": 0,
+    "confidence": 0.7312066358299232,
+    "action": "BUY"
+  },
+  {
+    "timestamp": "2026-04-17T18:04:11.212604",
+    "price": 253820.0,
+    "volume": 0,
+    "oi": 0,
+    "confidence": 0.7312066358299231,
+    "action": "BUY"
+  },
+  {
+    "timestamp": "2026-04-17T18:04:13.415620",
+    "price": 253833.0,
+    "volume": 0,
+    "oi": 0,
+    "confidence": 0.7312066358299232,
+    "action": "BUY"
+  },
+  {
+    "timestamp": "2026-04-17T18:04:15.597230",
+    "price": 253833.0,
+    "volume": 0,
+    "oi": 0,
+    "confidence": 0.7312066358299232,
+    "action": "BUY"
+  },
+  {
+    "timestamp": "2026-04-17T18:04:17.779257",
+    "price": 253833.0,
+    "volume": 0,
+    "oi": 0,
+    "confidence": 0.7312066358299231,
+    "action": "BUY"
+  },
+  {
+    "timestamp": "2026-04-17T18:04:19.933913",
+    "price": 253823.0,
+    "volume": 0,
+    "oi": 0,
+    "confidence": 0.7312066358299231,
+    "action": "BUY"
+  },
+  {
+    "timestamp": "2026-04-17T18:04:22.096150",
+    "price": 253823.0,
+    "volume": 0,
+    "oi": 0,
+    "confidence": 0.7312066358299231,
+    "action": "BUY"
+  },
+  {
+    "timestamp": "2026-04-17T18:04:24.286306",
+    "price": 253820.0,
+    "volume": 0,
+    "oi": 0,
+    "confidence": 0.7312066358299231,
+    "action": "BUY"
+  },
+  {
+    "timestamp": "2026-04-17T18:04:26.498770",
+    "price": 253820.0,
+    "volume": 0,
+    "oi": 0,
+    "confidence": 0.7312066358299232,
+    "action": "BUY"
+  },
+  {
+    "timestamp": "2026-04-17T18:04:28.901607",
+    "price": 253820.0,
+    "volume": 0,
+    "oi": 0,
+    "confidence": 0.7312066358299232,
+    "action": "BUY"
+  },
+  {
+    "timestamp": "2026-04-17T18:04:31.111695",
+    "price": 253820.0,
+    "volume": 0,
+    "oi": 0,
+    "confidence": 0.7312066358299232,
+    "action": "BUY"
+  },
+  {
+    "timestamp": "2026-04-17T18:04:33.292191",
+    "price": 253820.0,
+    "volume": 0,
+    "oi": 0,
+    "confidence": 0.7312066358299232,
+    "action": "BUY"
+  },
+  {
+    "timestamp": "2026-04-17T18:04:35.507201",
+    "price": 253820.0,
+    "volume": 0,
+    "oi": 0,
+    "confidence": 0.7312066358299232,
+    "action": "BUY"
+  },
+  {
+    "timestamp": "2026-04-17T18:04:37.698987",
+    "price": 253857.0,
+    "volume": 0,
+    "oi": 0,
+    "confidence": 0.7312066358299232,
+    "action": "BUY"
+  },
+  {
+    "timestamp": "2026-04-17T18:04:39.924681",
+    "price": 253857.0,
+    "volume": 0,
+    "oi": 0,
+    "confidence": 0.7312066358299232,
+    "action": "BUY"
+  },
+  {
+    "timestamp": "2026-04-17T18:04:42.131726",
+    "price": 253820.0,
+    "volume": 0,
+    "oi": 0,
+    "confidence": 0.7312066358299232,
+    "action": "BUY"
+  },
+  {
+    "timestamp": "2026-04-17T18:04:44.384971",
+    "price": 253820.0,
+    "volume": 0,
+    "oi": 0,
+    "confidence": 0.7312066358299232,
+    "action": "BUY"
+  },
+  {
+    "timestamp": "2026-04-17T18:04:46.607904",
+    "price": 253820.0,
+    "volume": 0,
+    "oi": 0,
+    "confidence": 0.7312066358299232,
+    "action": "BUY"
+  },
+  {
+    "timestamp": "2026-04-17T18:04:48.790785",
+    "price": 253820.0,
+    "volume": 0,
+    "oi": 0,
+    "confidence": 0.7312066358299232,
+    "action": "BUY"
+  },
+  {
+    "timestamp": "2026-04-17T18:04:50.962854",
+    "price": 253820.0,
+    "volume": 0,
+    "oi": 0,
+    "confidence": 0.7312066358299232,
+    "action": "BUY"
+  }
+]

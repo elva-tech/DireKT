@@ -1,0 +1,21 @@
+[
+  {
+    "order_id": "PAPER_20260417180353",
+    "trade_id": "f314431e-e17c-4557-be6c-972e3d2226d6",
+    "symbol": "SILVERMIC30APR26FUT",
+    "quantity": 2,
+    "user_id": "sanji",
+    "username": "Sanji",
+    "entry_price": 253816.0,
+    "sl_price": 250008.76,
+    "target_price": 256861.79200000002,
+    "exit_model": "fixed_pct",
+    "timestamp": "2026-04-17 18:03:53.309622",
+    "status": "CLOSED",
+    "exit_price": 253820.0,
+    "pnl": 8.0,
+    "pnl_pct": 0.0015759447788949474,
+    "close_timestamp": "2026-04-17 18:04:44.322207",
+    "exit_reason": "Manual emergency exit"
+  }
+]

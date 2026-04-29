@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCX Trading Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #0f172a;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        .test-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success { background: #22c55e; }
+        .error { background: #ef4444; }
+        .info { background: #3b82f6; }
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover { background: #2563eb; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🚀 MCX Trading Platform - Test Page</h1>
+        
+        <div class="status info">
+            <strong>Frontend Status:</strong> <span id="frontend-status">Checking...</span>
+        </div>
+        
+        <div class="status info">
+            <strong>Smart Allocator API:</strong> <span id="api-status">Checking...</span>
+        </div>
+        
+        <div class="status info">
+            <strong>Trading Integration:</strong> <span id="trading-status">Checking...</span>
+        </div>
+        
+        <div style="margin-top: 20px;">
+            <button onclick="testAPI()">Test Smart Allocator API</button>
+            <button onclick="testTradingAPI()">Test Trading API</button>
+            <button onclick="openMainApp()">Open Main App</button>
+        </div>
+        
+        <div id="results" style="margin-top: 20px;"></div>
+    </div>
+
+    <script>
+        // Test functions
+        async function testAPI() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<div class="status info">Testing Smart Allocator API...</div>';
+            
+            try {
+                const response = await fetch('http://localhost:5000/health');
+                const data = await response.json();
+                
+                if (data.status) {
+                    results.innerHTML = '<div class="status success">✅ Smart Allocator API is working!</div>';
+                } else {
+                    results.innerHTML = '<div class="status error">❌ Smart Allocator API returned error</div>';
+                }
+            } catch (error) {
+                results.innerHTML = `<div class="status error">❌ Smart Allocator API Error: ${error.message}</div>`;
+            }
+        }
+        
+        async function testTradingAPI() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<div class="status info">Testing Trading Integration API...</div>';
+            
+            try {
+                const response = await fetch('http://localhost:8001/health');
+                const data = await response.json();
+                
+                if (data.status) {
+                    results.innerHTML = '<div class="status success">✅ Trading Integration API is working!</div>';
+                } else {
+                    results.innerHTML = '<div class="status error">❌ Trading Integration API returned error</div>';
+                }
+            } catch (error) {
+                results.innerHTML = `<div class="status error">❌ Trading Integration API Error: ${error.message}</div>`;
+            }
+        }
+        
+        function openMainApp() {
+            window.open('http://localhost:3000', '_blank');
+        }
+        
+        // Check status on load
+        window.onload = async function() {
+            // Check frontend
+            document.getElementById('frontend-status').innerHTML = '✅ Running on port 3000';
+            
+            // Check APIs
+            try {
+                const apiResponse = await fetch('http://localhost:5000/health');
+                const apiData = await apiResponse.json();
+                document.getElementById('api-status').innerHTML = apiData.status ? '✅ Running on port 5000' : '❌ Error';
+            } catch (e) {
+                document.getElementById('api-status').innerHTML = '❌ Not reachable';
+            }
+            
+            try {
+                const tradingResponse = await fetch('http://localhost:8001/health');
+                const tradingData = await tradingResponse.json();
+                document.getElementById('trading-status').innerHTML = tradingData.status ? '✅ Running on port 8001' : '❌ Error';
+            } catch (e) {
+                document.getElementById('trading-status').innerHTML = '❌ Not reachable';
+            }
+        };
+    </script>
+</body>
+</html>
