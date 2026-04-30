@@ -172,6 +172,7 @@ function Login() {
                 required
                 style={{
                   width: '100%',
+                  boxSizing: 'border-box',
                   backgroundColor: 'rgba(2, 6, 23, 0.58)',
                   border: '1px solid rgba(71, 85, 105, 0.6)',
                   borderRadius: '10px',
@@ -203,6 +204,7 @@ function Login() {
                   required
                   style={{
                     width: '100%',
+                    boxSizing: 'border-box',
                     backgroundColor: 'rgba(2, 6, 23, 0.58)',
                     border: '1px solid rgba(71, 85, 105, 0.6)',
                     borderRadius: '10px',
@@ -256,6 +258,7 @@ function Login() {
                 required
                 style={{
                   width: '100%',
+                  boxSizing: 'border-box',
                   backgroundColor: 'rgba(2, 6, 23, 0.58)',
                   border: '1px solid rgba(71, 85, 105, 0.6)',
                   borderRadius: '10px',

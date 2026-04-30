@@ -223,7 +223,7 @@ function Dashboard() {
       backgroundColor: 'transparent',
       color: '#0f172a',
       minHeight: '100vh',
-      padding: '20px',
+      padding: '12px',
       fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, sans-serif'
     }}>
       {/* Header */}
@@ -231,20 +231,24 @@ function Dashboard() {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: '32px',
-        padding: '0 8px'
+        marginBottom: '16px',
+        padding: '18px 20px',
+        borderRadius: '16px',
+        background: 'linear-gradient(135deg, rgba(15,23,42,0.95), rgba(30,41,59,0.92))',
+        border: '1px solid rgba(148,163,184,0.22)',
+        boxShadow: '0 18px 36px rgba(2, 6, 23, 0.25)'
       }}>
         <div>
           <h1 style={{
-            fontSize: '2.5rem',
-            fontWeight: 'bold',
-            color: '#0f172a',
-            marginBottom: '8px',
+            fontSize: '2rem',
+            fontWeight: '700',
+            color: '#f8fafc',
+            marginBottom: '4px',
             letterSpacing: '-0.025em'
           }}>
             Trading Dashboard
           </h1>
-          <p style={{ color: '#64748b', fontSize: '1rem' }}>
+          <p style={{ color: '#94a3b8', fontSize: '0.9rem' }}>
             Real-time market overview and portfolio management
           </p>
         </div>
@@ -253,10 +257,10 @@ function Dashboard() {
           alignItems: 'center',
           gap: '12px',
           padding: '12px 20px',
-          backgroundColor: marketOpen ? 'rgba(34, 197, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)',
-          border: marketOpen ? '1px solid rgba(34, 197, 94, 0.3)' : '1px solid rgba(239, 68, 68, 0.3)',
+          backgroundColor: marketOpen ? 'rgba(34, 197, 94, 0.14)' : 'rgba(239, 68, 68, 0.14)',
+          border: marketOpen ? '1px solid rgba(34, 197, 94, 0.45)' : '1px solid rgba(239, 68, 68, 0.45)',
           borderRadius: '12px',
-          backdropFilter: 'blur(16px)'
+          backdropFilter: 'blur(10px)'
         }}>
           <div style={{
             width: '8px',
@@ -265,7 +269,7 @@ function Dashboard() {
             borderRadius: '50%',
             animation: 'pulse 2s infinite'
           }}></div>
-          <span style={{ color: marketOpen ? '#22c55e' : '#ef4444', fontSize: '0.9rem', fontWeight: '500' }}>
+          <span style={{ color: marketOpen ? '#4ade80' : '#f87171', fontSize: '0.82rem', fontWeight: '700', letterSpacing: '0.03em' }}>
             {marketOpen ? 'Market Open' : 'Market Closed'}
           </span>
         </div>
@@ -273,13 +277,12 @@ function Dashboard() {
 
       {/* User Info Card */}
       <div style={{
-        backgroundColor: 'rgba(255, 255, 255, 0.9)',
-        backdropFilter: 'blur(10px)',
-        border: '1px solid rgba(148, 163, 184, 0.25)',
-        borderRadius: '20px',
+        background: 'linear-gradient(140deg, rgba(255,255,255,0.95), rgba(248,250,252,0.9))',
+        border: '1px solid rgba(148, 163, 184, 0.2)',
+        borderRadius: '16px',
         padding: '24px',
-        marginBottom: '32px',
-        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+        marginBottom: '16px',
+        boxShadow: '0 12px 28px rgba(15, 23, 42, 0.12)'
       }}>
         <div style={{
           display: 'flex',
@@ -307,7 +310,7 @@ function Dashboard() {
             borderRadius: '12px',
             border: `1px solid ${getStrategyColor()}`
           }}>
-            <span style={{ color: '#0f172a', fontSize: '0.9rem', fontWeight: '500' }}>
+            <span style={{ color: '#0f172a', fontSize: '0.82rem', fontWeight: '700', letterSpacing: '0.02em' }}>
               {getStrategyName()}
             </span>
           </div>
@@ -321,7 +324,7 @@ function Dashboard() {
             <div style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '4px' }}>
               Trading Balance
             </div>
-            <div style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#0f172a' }}>
+            <div style={{ fontSize: '1.7rem', fontWeight: '700', color: '#0f172a' }}>
               ₹{balanceAmount.toLocaleString()}
             </div>
           </div>
@@ -392,12 +395,11 @@ function Dashboard() {
 
       {/* Market Overview */}
       <div style={{
-        backgroundColor: 'rgba(255, 255, 255, 0.9)',
-        backdropFilter: 'blur(10px)',
-        border: '1px solid rgba(148, 163, 184, 0.25)',
-        borderRadius: '20px',
+        background: 'linear-gradient(140deg, rgba(255,255,255,0.95), rgba(248,250,252,0.9))',
+        border: '1px solid rgba(148, 163, 184, 0.2)',
+        borderRadius: '16px',
         padding: '32px',
-        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+        boxShadow: '0 12px 28px rgba(15, 23, 42, 0.12)'
       }}>
         <h2 style={{
           fontSize: '1.5rem',
@@ -447,10 +449,10 @@ function Dashboard() {
           marginBottom: '24px'
         }}>
           <div style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.98)',
+            backgroundColor: 'rgba(248, 250, 252, 0.98)',
             padding: '20px',
             borderRadius: '12px',
-            border: '1px solid rgba(148, 163, 184, 0.28)'
+            border: '1px solid rgba(148, 163, 184, 0.22)'
           }}>
             <div style={{ color: '#334155', fontSize: '0.9rem', marginBottom: '8px', fontWeight: 600 }}>
               LTP
@@ -532,10 +534,10 @@ function Dashboard() {
 
         {/* Simple Chart Representation */}
         <div style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.98)',
+          backgroundColor: 'rgba(248, 250, 252, 0.98)',
           padding: '20px',
           borderRadius: '12px',
-          border: '1px solid rgba(148, 163, 184, 0.28)',
+          border: '1px solid rgba(148, 163, 184, 0.22)',
           height: '200px',
           display: 'flex',
           alignItems: 'center',
@@ -596,15 +598,14 @@ function Dashboard() {
         display: 'grid',
         gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
         gap: '24px',
-        marginBottom: '32px'
+        marginBottom: '16px'
       }}>
         <div style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.05)',
-          backdropFilter: 'blur(16px)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          borderRadius: '20px',
+          background: 'linear-gradient(135deg, rgba(15,23,42,0.92), rgba(30,41,59,0.86))',
+          border: '1px solid rgba(96, 165, 250, 0.24)',
+          borderRadius: '14px',
           padding: '24px',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+          boxShadow: '0 14px 30px rgba(2, 6, 23, 0.3)',
           transition: 'all 0.3s ease'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
@@ -624,10 +625,10 @@ function Dashboard() {
               VAL
             </div>
             <div>
-              <h3 style={{ fontSize: '0.9rem', color: '#9ca3af', marginBottom: '4px' }}>
+              <h3 style={{ fontSize: '0.82rem', color: '#94a3b8', marginBottom: '4px' }}>
                 Portfolio Value
               </h3>
-              <p style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#0f172a' }}>
+              <p style={{ fontSize: '1.7rem', fontWeight: '700', color: '#f8fafc' }}>
                 ₹{Number(totalValue || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
               </p>
             </div>
@@ -639,12 +640,11 @@ function Dashboard() {
         </div>
 
         <div style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.05)',
-          backdropFilter: 'blur(16px)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          borderRadius: '20px',
+          background: 'linear-gradient(135deg, rgba(15,23,42,0.92), rgba(30,41,59,0.86))',
+          border: '1px solid rgba(74, 222, 128, 0.22)',
+          borderRadius: '14px',
           padding: '24px',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+          boxShadow: '0 14px 30px rgba(2, 6, 23, 0.3)',
           transition: 'all 0.3s ease'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
@@ -664,29 +664,28 @@ function Dashboard() {
               BAL
             </div>
             <div>
-              <h3 style={{ fontSize: '0.9rem', color: '#9ca3af', marginBottom: '4px' }}>
+              <h3 style={{ fontSize: '0.82rem', color: '#94a3b8', marginBottom: '4px' }}>
                 Available Balance
               </h3>
-              <p style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#0f172a' }}>
+              <p style={{ fontSize: '1.7rem', fontWeight: '700', color: '#f8fafc' }}>
                 ₹{Math.max(0, availableBalance).toLocaleString('en-IN', { maximumFractionDigits: 2 })}
               </p>
             </div>
           </div>
-          <div style={{ color: '#6b7280', fontSize: '0.9rem' }}>
+          <div style={{ color: '#cbd5e1', fontSize: '0.9rem' }}>
             {(totalValue > 0 ? (Math.max(0, availableBalance) / totalValue) * 100 : 0).toFixed(1)}% of portfolio
           </div>
-          <div style={{ color: '#64748b', fontSize: '0.82rem', marginTop: '6px' }}>
+          <div style={{ color: '#94a3b8', fontSize: '0.82rem', marginTop: '6px' }}>
             Used margin: ₹{usedMargin.toLocaleString('en-IN', { maximumFractionDigits: 2 })}
           </div>
         </div>
 
         <div style={{
-          backgroundColor: 'rgba(255, 255, 255, 0.05)',
-          backdropFilter: 'blur(16px)',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          borderRadius: '20px',
+          background: 'linear-gradient(135deg, rgba(15,23,42,0.92), rgba(30,41,59,0.86))',
+          border: '1px solid rgba(167, 139, 250, 0.22)',
+          borderRadius: '14px',
           padding: '24px',
-          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+          boxShadow: '0 14px 30px rgba(2, 6, 23, 0.3)',
           transition: 'all 0.3s ease'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', marginBottom: '16px' }}>
@@ -706,15 +705,15 @@ function Dashboard() {
               WIN
             </div>
             <div>
-              <h3 style={{ fontSize: '0.9rem', color: '#9ca3af', marginBottom: '4px' }}>
+              <h3 style={{ fontSize: '0.82rem', color: '#94a3b8', marginBottom: '4px' }}>
                 Win Rate
               </h3>
-              <p style={{ fontSize: '1.8rem', fontWeight: 'bold', color: '#0f172a' }}>
+              <p style={{ fontSize: '1.7rem', fontWeight: '700', color: '#f8fafc' }}>
                 {Number(selectedPerf?.win_rate || 0).toFixed(2)}%
               </p>
             </div>
           </div>
-          <div style={{ color: '#6b7280', fontSize: '0.9rem' }}>
+          <div style={{ color: '#cbd5e1', fontSize: '0.9rem' }}>
             {getStrategyName()} performance from persisted closed trades
           </div>
         </div>
@@ -722,17 +721,16 @@ function Dashboard() {
 
       {/* Performance Chart */}
       <div style={{
-        backgroundColor: 'rgba(255, 255, 255, 0.05)',
-        backdropFilter: 'blur(16px)',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
-        borderRadius: '20px',
+        background: 'linear-gradient(135deg, rgba(15,23,42,0.92), rgba(30,41,59,0.86))',
+        border: '1px solid rgba(96, 165, 250, 0.2)',
+        borderRadius: '14px',
         padding: '32px',
-        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+        boxShadow: '0 14px 30px rgba(2, 6, 23, 0.3)'
       }}>
         <h2 style={{
           fontSize: '1.5rem',
           fontWeight: '600',
-          color: '#0f172a',
+          color: '#f8fafc',
           marginBottom: '24px',
           display: 'flex',
           alignItems: 'center',
@@ -743,10 +741,10 @@ function Dashboard() {
         </h2>
         
         <div style={{
-          backgroundColor: 'rgba(31, 41, 55, 0.3)',
+          backgroundColor: 'rgba(2, 6, 23, 0.38)',
           padding: '20px',
           borderRadius: '12px',
-          border: '1px solid rgba(75, 85, 99, 0.2)',
+          border: '1px solid rgba(148, 163, 184, 0.22)',
           height: '250px',
           display: 'flex',
           alignItems: 'center',
@@ -757,7 +755,7 @@ function Dashboard() {
             position: 'absolute',
             top: '10px',
             left: '10px',
-            color: '#6b7280',
+            color: '#94a3b8',
             fontSize: '0.9rem'
           }}>
             Weekly Performance
@@ -785,7 +783,7 @@ function Dashboard() {
                     maxHeight: `${WEEKLY_BAR_MAX}px`,
                   }}
                 ></div>
-                <span style={{ color: '#6b7280', fontSize: '0.75rem' }}>
+                <span style={{ color: '#94a3b8', fontSize: '0.75rem' }}>
                   {data.date}
                 </span>
               </div>

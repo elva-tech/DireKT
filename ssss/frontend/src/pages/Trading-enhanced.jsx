@@ -705,10 +705,11 @@ function Trading() {
         }}>
           {/* ML Trading */}
           <div style={{
-            backgroundColor: 'rgba(2, 6, 23, 0.52)',
-            padding: '18px',
-            borderRadius: '12px',
-            border: '1px solid rgba(148, 163, 184, 0.14)',
+            background: 'linear-gradient(165deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.82))',
+            padding: '22px',
+            borderRadius: '14px',
+            border: '1px solid rgba(96, 165, 250, 0.22)',
+            boxShadow: '0 14px 30px rgba(2, 6, 23, 0.3)',
             textAlign: 'center'
           }}>
             <div style={{
@@ -720,16 +721,16 @@ function Trading() {
             <h3 style={{
               fontSize: '1.3rem',
               fontWeight: '600',
-              color: 'white',
+              color: '#f8fafc',
               marginBottom: '12px'
             }}>
               ML Model Trading
             </h3>
             <p style={{
-              color: '#94a3b8',
+              color: '#cbd5e1',
               fontSize: '0.9rem',
               marginBottom: '20px',
-              lineHeight: '1.5'
+              lineHeight: '1.6'
             }}>
               Advanced machine learning algorithms with technical indicators for systematic trading
             </p>
@@ -742,7 +743,7 @@ function Trading() {
                 background: (!mlSystemActive) ? 
                   'linear-gradient(135deg, #3b82f6, #2563eb)' : 
                   'linear-gradient(135deg, #6b7280, #4b5563)',
-                color: 'white',
+                color: '#f8fafc',
                 border: 'none',
                 borderRadius: '12px',
                 fontSize: '1rem',
@@ -750,6 +751,7 @@ function Trading() {
                 cursor: (loading || mlSystemActive) ? 'not-allowed' : 'pointer',
                 opacity: (loading || mlSystemActive) ? 0.7 : 1,
                 transition: 'all 0.2s ease',
+                boxShadow: (!mlSystemActive) ? '0 10px 22px rgba(37, 99, 235, 0.35)' : 'none',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -815,10 +817,11 @@ function Trading() {
 
           {/* LLM Trading */}
           <div style={{
-            backgroundColor: 'rgba(2, 6, 23, 0.52)',
-            padding: '18px',
-            borderRadius: '12px',
-            border: '1px solid rgba(148, 163, 184, 0.14)',
+            background: 'linear-gradient(165deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.82))',
+            padding: '22px',
+            borderRadius: '14px',
+            border: '1px solid rgba(167, 139, 250, 0.24)',
+            boxShadow: '0 14px 30px rgba(2, 6, 23, 0.3)',
             textAlign: 'center'
           }}>
             <div style={{
@@ -830,16 +833,16 @@ function Trading() {
             <h3 style={{
               fontSize: '1.3rem',
               fontWeight: '600',
-              color: 'white',
+              color: '#f8fafc',
               marginBottom: '12px'
             }}>
               LLM Powered Trading
             </h3>
             <p style={{
-              color: '#94a3b8',
+              color: '#cbd5e1',
               fontSize: '0.9rem',
               marginBottom: '20px',
-              lineHeight: '1.5'
+              lineHeight: '1.6'
             }}>
               Language model with market analysis and adaptive decision making
             </p>
@@ -852,7 +855,7 @@ function Trading() {
                 background: (!llmSystemActive) ? 
                   'linear-gradient(135deg, #8b5cf6, #6366f1)' : 
                   'linear-gradient(135deg, #6b7280, #4b5563)',
-                color: 'white',
+                color: '#f8fafc',
                 border: 'none',
                 borderRadius: '12px',
                 fontSize: '1rem',
@@ -860,6 +863,7 @@ function Trading() {
                 cursor: (loading || llmSystemActive) ? 'not-allowed' : 'pointer',
                 opacity: (loading || llmSystemActive) ? 0.7 : 1,
                 transition: 'all 0.2s ease',
+                boxShadow: (!llmSystemActive) ? '0 10px 22px rgba(109, 40, 217, 0.35)' : 'none',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -925,26 +929,27 @@ function Trading() {
 
           {/* Hybrid: ML proposes, LLM verifies */}
           <div style={{
-            backgroundColor: 'rgba(2, 6, 23, 0.52)',
-            padding: '18px',
-            borderRadius: '12px',
-            border: '1px solid rgba(16, 185, 129, 0.35)',
+            background: 'linear-gradient(165deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.82))',
+            padding: '22px',
+            borderRadius: '14px',
+            border: '1px solid rgba(16, 185, 129, 0.34)',
+            boxShadow: '0 14px 30px rgba(2, 6, 23, 0.3)',
             textAlign: 'center'
           }}>
             <div style={{ fontSize: '2rem', marginBottom: '16px', fontWeight: 700 }}>HYB</div>
             <h3 style={{
               fontSize: '1.3rem',
               fontWeight: '600',
-              color: 'white',
+              color: '#f8fafc',
               marginBottom: '12px'
             }}>
               Hybrid (ML + LLM)
             </h3>
             <p style={{
-              color: '#94a3b8',
+              color: '#cbd5e1',
               fontSize: '0.9rem',
               marginBottom: '20px',
-              lineHeight: '1.5'
+              lineHeight: '1.6'
             }}>
               ML generates BUY/SELL; each proposal is verified by the LLM before paper execution. Stop-loss / take-profit auto-exits still apply.
             </p>
@@ -957,7 +962,7 @@ function Trading() {
                 background: (!hybridSystemActive)
                   ? 'linear-gradient(135deg, #10b981, #059669)'
                   : 'linear-gradient(135deg, #6b7280, #4b5563)',
-                color: 'white',
+                color: '#f8fafc',
                 border: 'none',
                 borderRadius: '12px',
                 fontSize: '1rem',
@@ -965,6 +970,7 @@ function Trading() {
                 cursor: (loading || hybridSystemActive) ? 'not-allowed' : 'pointer',
                 opacity: (loading || hybridSystemActive) ? 0.7 : 1,
                 transition: 'all 0.2s ease',
+                boxShadow: (!hybridSystemActive) ? '0 10px 22px rgba(5, 150, 105, 0.35)' : 'none',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
