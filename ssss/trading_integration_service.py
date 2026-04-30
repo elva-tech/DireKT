@@ -245,7 +245,7 @@ class TradingStatusResponse(BaseModel):
 # SMART ALLOCATOR INTEGRATION
 # ============================================================================
 
-SMART_ALLOCATOR_URL = "http://localhost:5000"
+SMART_ALLOCATOR_URL = os.getenv("SMART_ALLOCATOR_URL", "http://localhost:5000")
 
 def get_smart_allocation(balance: float, symbol_type: str = "SILVER"):
     """Get smart allocation from Smart Allocator API"""
