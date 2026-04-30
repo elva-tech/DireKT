@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { useAuthStore } from '../stores/authStore'
 
-const INTEGRATION_BASE = 'http://localhost:8001'
+const INTEGRATION_BASE = import.meta.env.VITE_INTEGRATION_URL || 'http://localhost:8001'
 // Slightly slower polling reduces Angel API rate limits; integration also caches ~8s server-side.
 const LIVE_POLL_MS = 6000
 const CHART_MAX_POINTS = 48
@@ -617,9 +617,11 @@ function Dashboard() {
               alignItems: 'center',
               justifyContent: 'center',
               marginRight: '16px',
-              fontSize: '24px'
+              fontSize: '11px',
+              fontWeight: 700,
+              color: '#dbeafe'
             }}>
-              PV
+              VAL
             </div>
             <div>
               <h3 style={{ fontSize: '0.9rem', color: '#9ca3af', marginBottom: '4px' }}>
@@ -655,9 +657,11 @@ function Dashboard() {
               alignItems: 'center',
               justifyContent: 'center',
               marginRight: '16px',
-              fontSize: '24px'
+              fontSize: '11px',
+              fontWeight: 700,
+              color: '#dcfce7'
             }}>
-              AB
+              BAL
             </div>
             <div>
               <h3 style={{ fontSize: '0.9rem', color: '#9ca3af', marginBottom: '4px' }}>
@@ -695,9 +699,11 @@ function Dashboard() {
               alignItems: 'center',
               justifyContent: 'center',
               marginRight: '16px',
-              fontSize: '24px'
+              fontSize: '11px',
+              fontWeight: 700,
+              color: '#ede9fe'
             }}>
-              WR
+              WIN
             </div>
             <div>
               <h3 style={{ fontSize: '0.9rem', color: '#9ca3af', marginBottom: '4px' }}>

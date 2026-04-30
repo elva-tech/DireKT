@@ -260,11 +260,6 @@ function Trading() {
     return tradingStrategy === 'ml' ? '#3b82f6' : '#8b5cf6'
   }
 
-  const getStrategyIcon = () => {
-    if (tradingStrategy === 'hybrid') return 'HYB'
-    return tradingStrategy === 'ml' ? 'ML' : 'LLM'
-  }
-
   return (
     <div style={{
       backgroundColor: 'transparent',
@@ -300,13 +295,11 @@ function Trading() {
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '8px',
           padding: '9px 12px',
           backgroundColor: `${getStrategyColor()}22`,
           borderRadius: '10px',
           border: `1px solid ${getStrategyColor()}66`
         }}>
-          <span style={{ fontSize: '0.95rem' }}>{getStrategyIcon()}</span>
           <span style={{ color: '#0f172a', fontSize: '0.8rem', fontWeight: '600' }}>
             {activeEngineLabel}
           </span>
@@ -515,13 +508,12 @@ function Trading() {
           <h2 style={{
             fontSize: '1.05rem',
             fontWeight: '600',
-            color: '#f8fafc',
+            color: '#0f172a',
             marginBottom: '14px',
             display: 'flex',
             alignItems: 'center',
             gap: '8px'
           }}>
-            <span style={{ fontSize: '1rem' }}>◎</span>
             Smart Lot Allocation
           </h2>
           {(lotAllocation.summary?.allocation_symbol_type || lotAllocation.buy_orders?.[0]?.contract) && (
@@ -622,7 +614,7 @@ function Trading() {
             <h3 style={{
               fontSize: '1.2rem',
               fontWeight: '500',
-              color: 'white',
+              color: '#0f172a',
               marginBottom: '16px'
             }}>
               Recommended Positions
@@ -648,7 +640,7 @@ function Trading() {
                     <span style={{
                       fontSize: '1.1rem',
                       fontWeight: '500',
-                      color: 'white'
+                      color: '#0f172a'
                     }}>
                       {order.contract}
                     </span>
@@ -679,7 +671,7 @@ function Trading() {
             borderRadius: '12px',
             padding: '16px',
             fontSize: '0.9rem',
-            color: '#94a3b8',
+            color: '#334155',
             lineHeight: '1.6'
           }}>
             <strong>Reasoning:</strong> {lotAllocation.summary.reasoning}
@@ -697,13 +689,12 @@ function Trading() {
         <h2 style={{
           fontSize: '1.05rem',
           fontWeight: '600',
-          color: '#f8fafc',
+          color: '#0f172a',
           marginBottom: '14px',
           display: 'flex',
           alignItems: 'center',
-          gap: '8px'
+          gap: '8px',
         }}>
-          <span style={{ fontSize: '1rem' }}>◈</span>
           AI Trading System
         </h2>
         
