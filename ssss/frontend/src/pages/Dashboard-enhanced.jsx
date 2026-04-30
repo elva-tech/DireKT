@@ -190,10 +190,6 @@ function Dashboard() {
     return tradingStrategy === 'ml' ? '#3b82f6' : '#8b5cf6'
   }
 
-  const getStrategyIcon = () => {
-    return tradingStrategy === 'ml' ? '🤖' : '🧠'
-  }
-
   const getStrategyName = () => {
     return tradingStrategy === 'ml' ? 'ML Model' : 'LLM Powered'
   }
@@ -299,7 +295,7 @@ function Dashboard() {
             alignItems: 'center',
             gap: '12px'
           }}>
-            <span style={{ fontSize: '1.5rem' }}>{getStrategyIcon()}</span>
+            <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: getStrategyColor(), display: 'inline-block' }}></span>
             Your Trading Profile
           </h2>
           <div style={{
@@ -311,7 +307,6 @@ function Dashboard() {
             borderRadius: '12px',
             border: `1px solid ${getStrategyColor()}`
           }}>
-            <span style={{ fontSize: '1.2rem' }}>{getStrategyIcon()}</span>
             <span style={{ color: '#0f172a', fontSize: '0.9rem', fontWeight: '500' }}>
               {getStrategyName()}
             </span>
@@ -413,7 +408,7 @@ function Dashboard() {
           alignItems: 'center',
           gap: '12px'
         }}>
-          <span style={{ fontSize: '1.5rem' }}>📊</span>
+          <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#2563eb', display: 'inline-block' }}></span>
           Market Overview
         </h2>
         <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '20px' }}>
@@ -624,7 +619,7 @@ function Dashboard() {
               marginRight: '16px',
               fontSize: '24px'
             }}>
-              💰
+              PV
             </div>
             <div>
               <h3 style={{ fontSize: '0.9rem', color: '#9ca3af', marginBottom: '4px' }}>
@@ -662,7 +657,7 @@ function Dashboard() {
               marginRight: '16px',
               fontSize: '24px'
             }}>
-              💵
+              AB
             </div>
             <div>
               <h3 style={{ fontSize: '0.9rem', color: '#9ca3af', marginBottom: '4px' }}>
@@ -702,7 +697,7 @@ function Dashboard() {
               marginRight: '16px',
               fontSize: '24px'
             }}>
-              {getStrategyIcon()}
+              WR
             </div>
             <div>
               <h3 style={{ fontSize: '0.9rem', color: '#9ca3af', marginBottom: '4px' }}>
@@ -737,7 +732,7 @@ function Dashboard() {
           alignItems: 'center',
           gap: '12px'
         }}>
-          <span style={{ fontSize: '1.5rem' }}>📊</span>
+          <span style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#2563eb', display: 'inline-block' }}></span>
           Portfolio Performance
         </h2>
         

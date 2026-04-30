@@ -261,8 +261,8 @@ function Trading() {
   }
 
   const getStrategyIcon = () => {
-    if (tradingStrategy === 'hybrid') return '🔀'
-    return tradingStrategy === 'ml' ? '🤖' : '🧠'
+    if (tradingStrategy === 'hybrid') return 'HYB'
+    return tradingStrategy === 'ml' ? 'ML' : 'LLM'
   }
 
   return (
@@ -625,7 +625,7 @@ function Trading() {
               color: 'white',
               marginBottom: '16px'
             }}>
-              📋 Recommended Positions
+              Recommended Positions
             </h3>
             <div style={{
               display: 'grid',
@@ -682,7 +682,7 @@ function Trading() {
             color: '#94a3b8',
             lineHeight: '1.6'
           }}>
-            <strong>💡 Reasoning:</strong> {lotAllocation.summary.reasoning}
+            <strong>Reasoning:</strong> {lotAllocation.summary.reasoning}
           </div>
         </div>
       )}
@@ -724,7 +724,7 @@ function Trading() {
               fontSize: '3rem',
               marginBottom: '16px'
             }}>
-              🤖
+              ML
             </div>
             <h3 style={{
               fontSize: '1.3rem',
@@ -791,12 +791,10 @@ function Trading() {
                 </>
               ) : mlSystemActive ? (
                 <>
-                  <span>✅</span>
                   ML System Active
                 </>
               ) : (
                 <>
-                  <span>🤖</span>
                   Start ML Trading
                 </>
               )}
@@ -836,7 +834,7 @@ function Trading() {
               fontSize: '3rem',
               marginBottom: '16px'
             }}>
-              🧠
+              LLM
             </div>
             <h3 style={{
               fontSize: '1.3rem',
@@ -903,12 +901,10 @@ function Trading() {
                 </>
               ) : llmSystemActive ? (
                 <>
-                  <span>✅</span>
                   LLM System Active
                 </>
               ) : (
                 <>
-                  <span>🧠</span>
                   Start LLM Trading
                 </>
               )}
@@ -944,7 +940,7 @@ function Trading() {
             border: '1px solid rgba(16, 185, 129, 0.35)',
             textAlign: 'center'
           }}>
-            <div style={{ fontSize: '3rem', marginBottom: '16px' }}>🔀</div>
+            <div style={{ fontSize: '2rem', marginBottom: '16px', fontWeight: 700 }}>HYB</div>
             <h3 style={{
               fontSize: '1.3rem',
               fontWeight: '600',
@@ -1010,12 +1006,10 @@ function Trading() {
                 </>
               ) : hybridSystemActive ? (
                 <>
-                  <span>✅</span>
                   Hybrid Active
                 </>
               ) : (
                 <>
-                  <span>🔀</span>
                   Start Hybrid Trading
                 </>
               )}
