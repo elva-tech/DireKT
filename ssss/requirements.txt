@@ -3,6 +3,7 @@ pandas>=1.5.0
 numpy>=1.24.0
 scikit-learn>=1.2.0
 python-dotenv>=0.21.0
+tzdata>=2024.1
 xgboost>=1.7.0
 lightgbm>=3.3.0
 matplotlib>=3.7.0
@@ -12,4 +13,7 @@ scipy>=1.10.0
 pyotp>=2.9.0
 google-api-python-client>=2.149.0
 google-auth>=2.35.0
+
+# Persistent auth on Render: set DATABASE_URL (Postgres); otherwise SQLite auth_users.db is ephemeral.
+psycopg[binary]>=3.1.0
 

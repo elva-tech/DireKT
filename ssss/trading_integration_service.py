@@ -26,7 +26,7 @@ from smart_allocator_external import (
     pick_best_contract,
     resolve_token_for_tradingsymbol,
 )
-from trading_bot import SilverFuturesTradingBot
+from trade_history_store import fetch_persisted_events, use_postgres
 
 
 def _dashboard_fixed_tradingsymbol(query_override: Optional[str]) -> str:
@@ -442,6 +442,8 @@ def start_trading_bot(
         ts = sym_family
 
     try:
+        from trading_bot import SilverFuturesTradingBot
+
         bot = SilverFuturesTradingBot(
             max_position_size=direct_lots,
             trading_symbol=ts,
@@ -888,29 +890,8 @@ async def get_trade_history(
     owner_key = _normalize_owner_key(user_id, username)
     if not owner_key:
         raise HTTPException(status_code=400, detail="Missing user identity for history request")
+    events: list = fetch_persisted_events(owner_key, limit, lifecycle=None)
     path = (os.getenv("TRADE_HISTORY_FILE") or "trade_history.jsonl").strip()
-    events: list = []
-    if path and os.path.isfile(path):
-        try:
-            with open(path, encoding="utf-8") as f:
-                for line in f:
-                    line = line.strip()
-                    if not line:
-                        continue
-                    try:
-                        row = json.loads(line)
-                    except json.JSONDecodeError:
-                        continue
-                    row_uid = (str(row.get("user_id") or "") or "").strip()
-                    row_un = (str(row.get("username") or "") or "").strip().lower()
-                    row_owner = row_uid or row_un
-                    if row_owner != owner_key:
-                        continue
-                    events.append(row)
-        except OSError:
-            pass
-    if len(events) > limit:
-        events = events[-limit:]
 
     session_trades: list = []
     active_strategies: list = []
@@ -944,7 +925,7 @@ async def get_trade_history(
         "session_trades": session_trades,
         "bot_active": bot_active,
         "active_strategies": active_strategies,
-        "history_file": path or None,
+        "history_file": ("postgresql/trade_history_events" if use_postgres() else (path or None)),
     }
 
 
@@ -961,31 +942,7 @@ async def get_performance_summary(
     owner_key = _normalize_owner_key(user_id, username)
     if not owner_key:
         raise HTTPException(status_code=400, detail="Missing user identity for performance summary")
-    path = (os.getenv("TRADE_HISTORY_FILE") or "trade_history.jsonl").strip()
-    rows: list = []
-    if path and os.path.isfile(path):
-        try:
-            with open(path, encoding="utf-8") as f:
-                for line in f:
-                    line = (line or "").strip()
-                    if not line:
-                        continue
-                    try:
-                        row = json.loads(line)
-                    except json.JSONDecodeError:
-                        continue
-                    row_uid = (str(row.get("user_id") or "") or "").strip()
-                    row_un = (str(row.get("username") or "") or "").strip().lower()
-                    row_owner = row_uid or row_un
-                    if row_owner != owner_key:
-                        continue
-                    if str(row.get("lifecycle") or "").upper() != "CLOSED":
-                        continue
-                    rows.append(row)
-        except OSError:
-            pass
-    if len(rows) > limit:
-        rows = rows[-limit:]
+    rows: list = fetch_persisted_events(owner_key, limit, lifecycle="CLOSED")
 
     engines = {
         "ml": {"engine": "ml", "trades": 0, "wins": 0, "win_rate": 0.0, "profit": 0.0, "loss": 0.0},

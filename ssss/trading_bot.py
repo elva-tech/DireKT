@@ -16,36 +16,27 @@ from pathlib import Path
 import pandas as pd
 import numpy as np
 from collections import deque
-from threading import Thread, Event, Lock
-from copy import deepcopy
-
-_trade_history_lock = Lock()
-
-
+from threading import Thread, Event
 def _persist_trade_history_event(position_snapshot: dict, lifecycle: str, decision_engine: str) -> None:
-    """Append one trade lifecycle row to JSONL (OPEN / CLOSED) for UI history."""
-    path = (os.getenv("TRADE_HISTORY_FILE") or "trade_history.jsonl").strip()
-    if not path:
-        return
+    """Append one trade lifecycle row for UI history (JSONL locally, Postgres if DATABASE_URL)."""
     try:
-        snap = deepcopy(position_snapshot)
-        snap["lifecycle"] = lifecycle
-        snap["decision_engine"] = decision_engine
-        line = json.dumps(snap, default=str)
-        with _trade_history_lock:
-            with open(path, "a", encoding="utf-8") as f:
-                f.write(line + "\n")
+        from trade_history_store import persist_trade_event
+
+        persist_trade_event(position_snapshot, lifecycle, decision_engine)
     except Exception as e:
         log.warning(f"Trade history persist failed: {e}")
 import schedule
 
+_handlers = [logging.StreamHandler()]
+try:
+    _handlers.append(logging.FileHandler("trading_bot.log"))
+except OSError:
+    pass
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s [%(levelname)s] %(message)s',
-    handlers=[
-        logging.FileHandler('trading_bot.log'),
-        logging.StreamHandler()
-    ]
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=_handlers,
+    force=True,
 )
 log = logging.getLogger(__name__)
 
