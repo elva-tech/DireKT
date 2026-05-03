@@ -6,7 +6,6 @@ services:
     name: integration-direkt
     runtime: python
     plan: free
-    region: singapore
     rootDir: ssss
     buildCommand: >-
       pip install --upgrade pip &&
