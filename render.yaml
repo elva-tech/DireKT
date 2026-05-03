@@ -1,0 +1,18 @@
+# Render Blueprint — deploy config only (no app source changes).
+# Existing manual Web Service: set Root Directory to "ssss" and align build/start with below,
+# or apply this file as a Blueprint from the Render dashboard.
+services:
+  - type: web
+    name: integration-direkt
+    runtime: python
+    plan: free
+    region: singapore
+    rootDir: ssss
+    buildCommand: >-
+      pip install --upgrade pip &&
+      pip install -r requirements.txt &&
+      pip install "fastapi>=0.109.0" "uvicorn[standard]>=0.24.0" "python-multipart>=0.0.6"
+    startCommand: uvicorn trading_integration_service:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.9"
