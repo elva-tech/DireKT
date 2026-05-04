@@ -11,6 +11,10 @@ seaborn>=0.12.0
 schedule>=1.2.0
 scipy>=1.10.0
 pyotp>=2.9.0
+# Angel One SmartAPI — provides `SmartApi` / `SmartConnect` for smart_allocator_external.py
+smartapi-python>=1.3.0
+websocket-client>=1.6.0
+logzero>=1.7.0
 google-api-python-client>=2.149.0
 google-auth>=2.35.0
 
