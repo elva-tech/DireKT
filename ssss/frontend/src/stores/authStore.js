@@ -188,34 +188,38 @@ export const useAuthStore = create((set, get) => ({
   },
 
   initializeAuth: () => {
-    const sessionId = localStorage.getItem('sessionId')
-    const balanceAmount = localStorage.getItem('userBalance')
-    const tradingStrategy = localStorage.getItem('tradingStrategy')
-    const username = localStorage.getItem('username')
-    
-    if (sessionId) {
-      const instrumentSymbol = localStorage.getItem('instrumentSymbol') || null
-      const instrumentToken = localStorage.getItem('instrumentToken') || null
-      const allocationSymbolType = localStorage.getItem('allocationSymbolType') || null
-      set({ 
-        sessionId, 
-        isAuthenticated: true,
-        user: {
-          id: 1,
-          username: username || 'user',
-          name: 'User',
-          email: 'user@mcxtrading.com',
-        },
-        balanceAmount: balanceAmount ? parseFloat(balanceAmount) : 100000,
-        tradingStrategy: tradingStrategy || 'ml',
-        instrumentSymbol: instrumentSymbol || null,
-        instrumentToken: instrumentToken || null,
-        allocationSymbolType: allocationSymbolType || null,
-        isLoading: false 
-      })
-      get().fetchSmartAllocation().catch(() => {})
-    } else {
-      set({ isLoading: false })
+    try {
+      const sessionId = localStorage.getItem('sessionId')
+      const balanceAmount = localStorage.getItem('userBalance')
+      const tradingStrategy = localStorage.getItem('tradingStrategy')
+      const username = localStorage.getItem('username')
+
+      if (sessionId) {
+        const instrumentSymbol = localStorage.getItem('instrumentSymbol') || null
+        const instrumentToken = localStorage.getItem('instrumentToken') || null
+        const allocationSymbolType = localStorage.getItem('allocationSymbolType') || null
+        set({
+          sessionId,
+          isAuthenticated: true,
+          user: {
+            id: 1,
+            username: username || 'user',
+            name: 'User',
+            email: 'user@mcxtrading.com',
+          },
+          balanceAmount: balanceAmount ? parseFloat(balanceAmount) : 100000,
+          tradingStrategy: tradingStrategy || 'ml',
+          instrumentSymbol: instrumentSymbol || null,
+          instrumentToken: instrumentToken || null,
+          allocationSymbolType: allocationSymbolType || null,
+          isLoading: false,
+        })
+        get().fetchSmartAllocation().catch(() => {})
+      } else {
+        set({ isLoading: false })
+      }
+    } catch {
+      set({ isAuthenticated: false, sessionId: null, isLoading: false })
     }
   },
 

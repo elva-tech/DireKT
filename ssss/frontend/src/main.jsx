@@ -67,7 +67,37 @@ const queryClient = new QueryClient({
   },
 })
 
-ReactDOM.createRoot(document.getElementById('root')).render(
+const _esc = (s) =>
+  String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+
+window.addEventListener('error', (event) => {
+  if (!document.getElementById('static-boot-shell')) return
+  const root = document.getElementById('root')
+  if (!root) return
+  root.innerHTML = `<div style="padding:24px;font-family:system-ui;max-width:560px;margin:40px auto;color:#0f172a"><h1 style="font-size:1.1rem">Script error</h1><pre style="background:#f1f5f9;padding:12px;border-radius:8px;white-space:pre-wrap;font-size:12px">${_esc(
+    event.message || event.error || 'unknown'
+  )}</pre><p style="color:#64748b;font-size:14px">Hard refresh (Ctrl+Shift+R). If an old <code>/assets/</code> file 404s, clear site data for this origin.</p></div>`
+})
+
+window.addEventListener('unhandledrejection', (event) => {
+  if (!document.getElementById('static-boot-shell')) return
+  const root = document.getElementById('root')
+  if (!root) return
+  const reason = event.reason?.message || event.reason || 'unhandledrejection'
+  root.innerHTML = `<div style="padding:24px;font-family:system-ui;max-width:560px;margin:40px auto;color:#0f172a"><h1 style="font-size:1.1rem">Startup failed</h1><pre style="background:#f1f5f9;padding:12px;border-radius:8px;white-space:pre-wrap;font-size:12px">${_esc(
+    reason
+  )}</pre></div>`
+})
+
+const rootEl = document.getElementById('root')
+if (!rootEl) {
+  document.body.innerHTML =
+    '<p style="padding:24px;font-family:sans-serif">Missing #root — check index.html.</p>'
+} else {
+  ReactDOM.createRoot(rootEl).render(
   <React.StrictMode>
     <RootErrorBoundary>
       <QueryClientProvider client={queryClient}>
@@ -101,4 +131,5 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       </QueryClientProvider>
     </RootErrorBoundary>
   </React.StrictMode>
-)
+  )
+}
