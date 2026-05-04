@@ -306,7 +306,7 @@ function Login() {
                     border: '2px solid rgba(255, 255, 255, 0.3)',
                     borderTop: '2px solid white',
                     borderRadius: '50%',
-                    animation: 'spin 1s linear infinite'
+                    animation: 'login-spin 1s linear infinite'
                   }}></div>
                   Processing
                 </>
@@ -328,12 +328,14 @@ function Login() {
         </div>
       </div>
 
-      <style jsx>{`
-        @keyframes spin {
+      <style>
+        {`
+        @keyframes login-spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
         }
-      `}</style>
+      `}
+      </style>
     </div>
   )
 }

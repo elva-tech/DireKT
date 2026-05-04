@@ -86,7 +86,7 @@ function Header({ user }) {
             height: '7px',
             backgroundColor: marketOpen ? '#34d399' : '#ef4444',
             borderRadius: '50%',
-            animation: 'pulse 2s infinite'
+            animation: 'header-pulse 2s infinite'
           }}></div>
           <span style={{ color: marketOpen ? '#34d399' : '#fca5a5', fontSize: '0.78rem', fontWeight: '600' }}>
             {marketOpen ? 'MARKET OPEN' : 'MARKET CLOSED'}
@@ -141,12 +141,14 @@ function Header({ user }) {
         </div>
       </div>
 
-      <style jsx>{`
-        @keyframes pulse {
+      <style>
+        {`
+        @keyframes header-pulse {
           0%, 100% { opacity: 1; }
           50% { opacity: 0.5; }
         }
-      `}</style>
+      `}
+      </style>
     </div>
   )
 }

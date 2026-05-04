@@ -267,7 +267,7 @@ function Dashboard() {
             height: '8px',
             backgroundColor: marketOpen ? '#22c55e' : '#ef4444',
             borderRadius: '50%',
-            animation: 'pulse 2s infinite'
+            animation: 'dashboard-pulse 2s infinite'
           }}></div>
           <span style={{ color: marketOpen ? '#4ade80' : '#f87171', fontSize: '0.82rem', fontWeight: '700', letterSpacing: '0.03em' }}>
             {marketOpen ? 'Market Open' : 'Market Closed'}
@@ -792,12 +792,14 @@ function Dashboard() {
         </div>
       </div>
 
-      <style jsx>{`
-        @keyframes pulse {
+      <style>
+        {`
+        @keyframes dashboard-pulse {
           0%, 100% { opacity: 1; }
           50% { opacity: 0.5; }
         }
-      `}</style>
+      `}
+      </style>
     </div>
   )
 }

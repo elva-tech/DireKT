@@ -39,19 +39,21 @@ function App() {
             border: '4px solid rgba(255, 255, 255, 0.1)',
             borderTop: '4px solid #3b82f6',
             borderRadius: '50%',
-            animation: 'spin 1s linear infinite',
+            animation: 'app-spin 1s linear infinite',
             margin: '0 auto 20px'
           }}></div>
           <p style={{ color: '#94a3b8', fontSize: '1.1rem' }}>
             Initializing MCX Trading Platform...
           </p>
         </div>
-        <style jsx>{`
-          @keyframes spin {
+        <style>
+          {`
+          @keyframes app-spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
           }
-        `}</style>
+        `}
+        </style>
       </div>
     )
   }

@@ -778,7 +778,7 @@ function Trading() {
                     border: '2px solid rgba(255, 255, 255, 0.3)',
                     borderTop: '2px solid white',
                     borderRadius: '50%',
-                    animation: 'spin 1s linear infinite'
+                    animation: 'trading-spin 1s linear infinite'
                   }}></div>
                   Starting ML System...
                 </>
@@ -890,7 +890,7 @@ function Trading() {
                     border: '2px solid rgba(255, 255, 255, 0.3)',
                     borderTop: '2px solid white',
                     borderRadius: '50%',
-                    animation: 'spin 1s linear infinite'
+                    animation: 'trading-spin 1s linear infinite'
                   }}></div>
                   Starting LLM System...
                 </>
@@ -997,7 +997,7 @@ function Trading() {
                     border: '2px solid rgba(255, 255, 255, 0.3)',
                     borderTop: '2px solid white',
                     borderRadius: '50%',
-                    animation: 'spin 1s linear infinite'
+                    animation: 'trading-spin 1s linear infinite'
                   }}></div>
                   Starting Hybrid...
                 </>
@@ -1051,7 +1051,7 @@ function Trading() {
               height: '8px',
               backgroundColor: '#22c55e',
               borderRadius: '50%',
-              animation: 'pulse 2s infinite'
+              animation: 'trading-pulse 2s infinite'
             }}></div>
             <span>Systems Ready</span>
           </div>
@@ -1062,16 +1062,18 @@ function Trading() {
         </div>
       </div>
 
-      <style jsx>{`
-        @keyframes spin {
+      <style>
+        {`
+        @keyframes trading-spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
         }
-        @keyframes pulse {
+        @keyframes trading-pulse {
           0%, 100% { opacity: 1; }
           50% { opacity: 0.5; }
         }
-      `}</style>
+      `}
+      </style>
     </div>
   )
 }

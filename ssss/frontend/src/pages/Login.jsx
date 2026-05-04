@@ -279,7 +279,7 @@ function Login() {
                     border: '2px solid rgba(255, 255, 255, 0.3)',
                     borderTop: '2px solid white',
                     borderRadius: '50%',
-                    animation: 'spin 1s linear infinite'
+                    animation: 'legacy-login-spin 1s linear infinite'
                   }}></div>
                   Signing in...
                 </>
@@ -334,7 +334,7 @@ function Login() {
               backgroundColor: '#22c55e',
               borderRadius: '50%',
               marginRight: '8px',
-              animation: 'pulse 2s infinite'
+              animation: 'legacy-login-pulse 2s infinite'
             }}></div>
             <span>Enhanced Security Active</span>
           </div>
@@ -342,16 +342,18 @@ function Login() {
         </div>
       </div>
 
-      <style jsx>{`
-        @keyframes spin {
+      <style>
+        {`
+        @keyframes legacy-login-spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
         }
-        @keyframes pulse {
+        @keyframes legacy-login-pulse {
           0%, 100% { opacity: 1; }
           50% { opacity: 0.5; }
         }
-      `}</style>
+      `}
+      </style>
     </div>
   )
 }
