@@ -6,6 +6,7 @@ Connects frontend with Smart Allocator and Trading Systems
 import os
 import copy
 import time
+import logging
 from datetime import datetime, timezone, date, time as dt_time
 from zoneinfo import ZoneInfo
 
@@ -27,6 +28,18 @@ from smart_allocator_external import (
     resolve_token_for_tradingsymbol,
 )
 from trade_history_store import fetch_persisted_events, use_postgres
+from trading_session_store import (
+    fetch_all_running_sessions,
+    fetch_order_executions,
+    fetch_session,
+    fetch_sessions_for_owner,
+    log_activity,
+    log_order_execution,
+    upsert_session_running,
+    upsert_session_stopped,
+)
+
+log = logging.getLogger(__name__)
 
 
 def _dashboard_fixed_tradingsymbol(query_override: Optional[str]) -> str:
@@ -236,16 +249,43 @@ class TradingStartRequest(BaseModel):
     username: Optional[str] = None
 
 class TradingStatusResponse(BaseModel):
+    """active = thread alive OR persisted 'running' (server-side intent after relogin / deploy)."""
+
     status: bool
     message: str
     system_type: str
     active: bool
+    thread_alive: bool = False
+    persisted_running: bool = False
+    resume_pending: bool = False
 
 # ============================================================================
 # SMART ALLOCATOR INTEGRATION
 # ============================================================================
 
 SMART_ALLOCATOR_URL = os.getenv("SMART_ALLOCATOR_URL", "http://localhost:5000")
+
+_ALLOCATOR_URL_HINT = (
+    "Verify SMART_ALLOCATOR_URL on the integration service and that the allocator Web Service is up."
+)
+
+
+def _sanitize_upstream_html_error(raw: Optional[str], http_status: int, hint: str) -> str:
+    """Avoid surfacing full HTML (e.g. Render 502 pages) in API error messages."""
+    if raw is None or not str(raw).strip():
+        return f"HTTP {http_status}" if http_status else "Request failed"
+    s = str(raw).strip()
+    head = s[:1200].lower()
+    if (
+        s.startswith("<!DOCTYPE")
+        or s.startswith("<html")
+        or "<title>502</title>" in head
+        or "<title>503</title>" in head
+        or "<title>504</title>" in head
+    ):
+        return f"Upstream returned an HTML error page (HTTP {http_status}). {hint}"
+    return s if len(s) <= 400 else s[:400] + "…"
+
 
 def get_smart_allocation(balance: float, symbol_type: str = "SILVER"):
     """Get smart allocation from Smart Allocator API"""
@@ -270,14 +310,19 @@ def get_smart_allocation(balance: float, symbol_type: str = "SILVER"):
             detail = response.json()
         except Exception:
             detail = {"message": (response.text or "").strip()[:400]}
+        raw_err = (
+            detail.get("detail", {}).get("message")
+            if isinstance(detail.get("detail"), dict)
+            else detail.get("detail")
+        )
+        if raw_err is None:
+            raw_err = detail.get("message")
+        if raw_err is None:
+            raw_err = f"Allocator HTTP {response.status_code}"
         return {
             "status": False,
-            "error": (
-                detail.get("detail", {}).get("message")
-                if isinstance(detail.get("detail"), dict)
-                else detail.get("detail")
-                or detail.get("message")
-                or f"Allocator HTTP {response.status_code}"
+            "error": _sanitize_upstream_html_error(
+                str(raw_err), response.status_code, _ALLOCATOR_URL_HINT
             ),
             "details": detail,
         }
@@ -497,6 +542,30 @@ def start_trading_bot(
     trading_systems[strategy]["pid"] = thread.ident
     trading_systems[strategy]["last_started"] = "now"
 
+    try:
+        persist_cfg = {
+            "balance": float(balance),
+            "symbol_family": sym_family,
+            "tradingsymbol": ts,
+            "symbol_token": tok,
+            "max_lots": int(direct_lots),
+        }
+        upsert_session_running(owner_key, owner_username, strategy, persist_cfg)
+        log_activity(
+            owner_key,
+            f"{strategy.upper()} trading session persisted (survives logout / restart)",
+            strategy,
+            payload={"tradingsymbol": ts, "max_lots": direct_lots},
+        )
+        log_order_execution(
+            owner_key,
+            strategy,
+            "ENGINE_START",
+            {"tradingsymbol": ts, "symbol_token_set": bool(tok), "max_lots": direct_lots, "balance": balance},
+        )
+    except Exception as e:
+        log_activity(owner_key, f"session persist warning: {e}", strategy, level="WARN")
+
     return {
         "status": True,
         "message": f"{strategy.upper()} trading started (paper mode, live Angel quotes)",
@@ -508,6 +577,91 @@ def start_trading_bot(
         "allocation_symbol_type": sym_family,
         "owner": owner_username or owner_key,
     }
+
+
+# --- Background resume (DB + process restart) --------------------------------
+
+_resume_in_progress: set = set()
+_resume_lock = threading.Lock()
+
+
+def _resume_from_session_row(row: dict) -> dict:
+    """Restart a bot from persisted session row (same process as /api/trading/start)."""
+    cfg = row.get("config") or {}
+    bal = float(cfg.get("balance") or 0)
+    if bal <= 0:
+        return {"status": False, "message": "Resume skipped: saved balance missing or zero", "system": row.get("strategy")}
+    return start_trading_bot(
+        bal,
+        str(row.get("strategy") or "ml"),
+        symbol_family=str(cfg.get("symbol_family") or "SILVER"),
+        tradingsymbol=cfg.get("tradingsymbol"),
+        symbol_token=cfg.get("symbol_token"),
+        max_lots=cfg.get("max_lots"),
+        owner_key=str(row.get("owner_key") or ""),
+        owner_username=row.get("username"),
+    )
+
+
+def _schedule_resume_if_db_running(owner_key: str, strategy: str) -> None:
+    """If DB says running but thread is dead, resume in a background thread (debounced)."""
+    if not owner_key or strategy not in ("ml", "llm", "hybrid"):
+        return
+    row = fetch_session(owner_key, strategy)
+    if not row or row.get("desired_state") != "running":
+        return
+    if _runtime_alive(owner_key, strategy):
+        return
+    key = (owner_key, strategy)
+    with _resume_lock:
+        if key in _resume_in_progress:
+            return
+        _resume_in_progress.add(key)
+
+    def _run():
+        try:
+            log.info("Resuming trading session %s / %s from persistence", owner_key, strategy)
+            log_activity(owner_key, f"Resume thread started for {strategy}", strategy)
+            out = _resume_from_session_row(row)
+            if not out.get("status"):
+                log.warning("Resume failed for %s %s: %s", owner_key, strategy, out.get("message"))
+                log_activity(
+                    owner_key,
+                    f"Resume failed: {out.get('message')}",
+                    strategy,
+                    level="WARN",
+                    payload=out,
+                )
+        except Exception as e:
+            log.exception("Resume exception %s %s: %s", owner_key, strategy, e)
+            log_activity(owner_key, f"Resume exception: {e}", strategy, level="WARN")
+        finally:
+            with _resume_lock:
+                _resume_in_progress.discard(key)
+
+    threading.Thread(target=_run, daemon=True).start()
+
+
+def _resume_all_sessions_background() -> None:
+    """Called once on service startup: reload engines marked running in the database."""
+    time.sleep(float(os.getenv("TRADING_RESUME_BOOT_DELAY_SEC", "2") or 2))
+    rows = fetch_all_running_sessions()
+    log.info("Startup: %d persisted running session(s) to evaluate", len(rows))
+    for row in rows:
+        owner_key = str(row.get("owner_key") or "")
+        strategy = str(row.get("strategy") or "")
+        if not owner_key or strategy not in ("ml", "llm", "hybrid"):
+            continue
+        if _runtime_alive(owner_key, strategy):
+            continue
+        log_activity(owner_key, f"Startup resume for {strategy}", strategy)
+        try:
+            out = _resume_from_session_row(row)
+            if not out.get("status"):
+                log.warning("Startup resume failed %s %s: %s", owner_key, strategy, out.get("message"))
+        except Exception as e:
+            log.exception("Startup resume error %s %s: %s", owner_key, strategy, e)
+
 
 # ============================================================================
 # API ROUTES
@@ -780,22 +934,101 @@ async def start_trading_system(request: TradingStartRequest):
 
 @app.get("/api/trading/status/{strategy}")
 async def get_trading_status(strategy: str, user_id: Optional[str] = Query(None), username: Optional[str] = Query(None)):
-    """Get status of trading system"""
-    
+    """Get status of trading system (in-memory thread + persisted running intent)."""
+
     if strategy not in trading_systems:
         raise HTTPException(status_code=404, detail="Strategy not found")
 
     system = trading_systems[strategy]
     owner_key = _normalize_owner_key(user_id, username)
-    alive = bool(owner_key) and _runtime_alive(owner_key, strategy)
-    active = bool(alive)
+    thread_alive = bool(owner_key) and _runtime_alive(owner_key, strategy)
+    row = fetch_session(owner_key, strategy) if owner_key else None
+    persisted_running = bool(row and row.get("desired_state") == "running")
+    if owner_key and persisted_running and not thread_alive:
+        _schedule_resume_if_db_running(owner_key, strategy)
+    effective_active = thread_alive or persisted_running
+    resume_pending = persisted_running and not thread_alive
 
     return TradingStatusResponse(
-        status=active,
-        message=f"{system['name']} is {'active' if active else 'inactive'}",
+        status=effective_active,
+        message=(
+            f"{system['name']} is running on server"
+            if effective_active
+            else f"{system['name']} is inactive"
+        ),
         system_type=strategy,
-        active=active,
+        active=effective_active,
+        thread_alive=thread_alive,
+        persisted_running=persisted_running,
+        resume_pending=resume_pending,
     )
+
+
+@app.get("/api/trading/sessions")
+async def list_trading_sessions(user_id: Optional[str] = Query(None), username: Optional[str] = Query(None)):
+    """Persisted bot sessions for this user (running/stopped + saved resume config)."""
+    owner_key = _normalize_owner_key(user_id, username)
+    if not owner_key:
+        raise HTTPException(status_code=400, detail="Missing user identity")
+    sessions = fetch_sessions_for_owner(owner_key)
+    out = {}
+    for s in ("ml", "llm", "hybrid"):
+        row = sessions.get(s)
+        alive = _runtime_alive(owner_key, s)
+        persisted_running = bool(row and row.get("desired_state") == "running")
+        cfg = (row or {}).get("config") or {}
+        out[s] = {
+            "strategy": s,
+            "thread_alive": alive,
+            "persisted_desired_state": (row or {}).get("desired_state") or "stopped",
+            "persisted_running": persisted_running,
+            "effective_active": alive or persisted_running,
+            "updated_at": (row or {}).get("updated_at"),
+            "saved_config": {
+                "balance": cfg.get("balance"),
+                "symbol_family": cfg.get("symbol_family"),
+                "tradingsymbol": cfg.get("tradingsymbol"),
+                "max_lots": cfg.get("max_lots"),
+            },
+        }
+    return {"status": True, "owner_key": owner_key, "sessions": out}
+
+
+@app.get("/api/trading/positions")
+async def get_active_positions(
+    user_id: Optional[str] = Query(None),
+    username: Optional[str] = Query(None),
+    limit: int = Query(100, ge=1, le=500),
+):
+    """OPEN trades from persistence plus any in-memory open position on running bots."""
+    owner_key = _normalize_owner_key(user_id, username)
+    if not owner_key:
+        raise HTTPException(status_code=400, detail="Missing user identity")
+    open_events = fetch_persisted_events(owner_key, limit, lifecycle="OPEN")
+    live: list = []
+    owner = _user_engines.get(owner_key) or {}
+    engines = owner.get("engines") or {}
+    for s in ("ml", "llm", "hybrid"):
+        if not _runtime_alive(owner_key, s):
+            continue
+        bot = (engines.get(s) or {}).get("bot")
+        if not bot or not getattr(bot, "open_position", None):
+            continue
+        try:
+            op = getattr(bot, "open_position", None)
+            if op:
+                row = json.loads(json.dumps(op, default=str))
+                row["decision_engine"] = s
+                row["source"] = "live_bot"
+                live.append(row)
+        except Exception:
+            continue
+    return {
+        "status": True,
+        "open_from_history": open_events,
+        "open_live": live,
+        "order_executions_tail": fetch_order_executions(owner_key, limit=min(200, limit)),
+    }
 
 
 @app.get("/api/trading/metrics/{strategy}")
@@ -972,16 +1205,28 @@ async def get_performance_summary(
 @app.post("/api/trading/stop/{strategy}")
 async def stop_trading_system(strategy: str, user_id: Optional[str] = Query(None), username: Optional[str] = Query(None)):
     """Stop trading system"""
-    
+
     if strategy not in trading_systems:
         raise HTTPException(status_code=404, detail="Strategy not found")
 
     owner_key = _normalize_owner_key(user_id, username)
     if not owner_key:
         raise HTTPException(status_code=400, detail="Missing user identity for stop request")
+    owner = _user_engines.get(owner_key) or {}
+    uname = owner.get("username") or username
     stopped = _stop_runtime(owner_key, strategy)
+    # Always clear persisted intent so UI/logout cannot leave a "zombie" running session.
+    try:
+        upsert_session_stopped(owner_key, uname, strategy)
+        log_activity(owner_key, f"{strategy} stop requested (API)", strategy, payload={"had_runtime": stopped})
+        log_order_execution(owner_key, strategy, "ENGINE_STOP", {"source": "api_stop", "had_runtime": stopped})
+    except Exception:
+        pass
     if not stopped:
-        return {"status": False, "message": f"{strategy} is not active for this user"}
+        return {
+            "status": True,
+            "message": "Trading marked stopped (no in-process engine was running)",
+        }
     any_active_for_strategy = any(_runtime_alive(k, strategy) for k in list(_user_engines.keys()))
     trading_systems[strategy]["status"] = bool(any_active_for_strategy)
     trading_systems[strategy]["pid"] = None
@@ -1036,6 +1281,13 @@ async def manual_reset_trading_system(strategy: str, user_id: Optional[str] = Qu
         return {"status": True, "strategy": strategy, "result": result}
     except Exception as e:
         return {"status": False, "message": f"Manual reset failed: {e}"}
+
+
+@app.on_event("startup")
+async def _startup_resume_persisted_sessions():
+    """Reload engines that were left 'running' in the database (deploy / crash recovery)."""
+    threading.Thread(target=_resume_all_sessions_background, daemon=True).start()
+
 
 # ============================================================================
 # RUN SERVER

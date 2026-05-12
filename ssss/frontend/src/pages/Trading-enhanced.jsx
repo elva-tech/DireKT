@@ -14,11 +14,11 @@ function Trading() {
     stopTradingSystem,
     emergencyExitTradingSystem,
     manualResetTradingSystem,
-    getTradingSystemStatus,
     updateStrategy,
     mlSystemActive,
     llmSystemActive,
     hybridSystemActive,
+    refreshAllTradingStatuses,
   } = useAuthStore()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -169,26 +169,19 @@ function Trading() {
     })
   }, [balanceAmount])
 
-  // Sync UI with backend after refresh and poll periodically.
+  // Sync UI with backend after refresh and poll periodically (uses persisted server-side sessions).
   useEffect(() => {
-    let mounted = true
     const refreshStatus = async () => {
       try {
-        const [ml, llm, hybrid] = await Promise.all([
-          getTradingSystemStatus('ml'),
-          getTradingSystemStatus('llm'),
-          getTradingSystemStatus('hybrid'),
-        ])
-        if (!mounted) return
+        await refreshAllTradingStatuses()
       } catch (_) {}
     }
     refreshStatus()
     const id = setInterval(refreshStatus, 5000)
     return () => {
-      mounted = false
       clearInterval(id)
     }
-  }, [])
+  }, [refreshAllTradingStatuses])
 
   useEffect(() => {
     let mounted = true
@@ -319,6 +312,19 @@ function Trading() {
           <strong>Error:</strong> {error}
         </div>
       )}
+
+      <div style={{
+        fontSize: '0.8rem',
+        color: '#475569',
+        marginBottom: '16px',
+        padding: '10px 12px',
+        backgroundColor: 'rgba(59, 130, 246, 0.08)',
+        borderRadius: '10px',
+        border: '1px solid rgba(59, 130, 246, 0.2)',
+      }}>
+        Engines run on the integration server. Closing this browser or logging out does not stop trading.
+        Use <strong>Stop</strong> for each strategy to halt the bot. After you sign in again, status syncs automatically.
+      </div>
 
       {/* Model Comparison (ML vs LLM vs Hybrid) */}
       <div style={{

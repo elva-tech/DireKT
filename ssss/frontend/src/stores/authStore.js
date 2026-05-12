@@ -3,6 +3,37 @@ import { create } from 'zustand'
 const BACKEND_BASE = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000'
 const INTEGRATION_BASE = import.meta.env.VITE_INTEGRATION_URL || 'http://localhost:8001'
 
+/** Read body as JSON; if the server returns HTML (e.g. Render 502), throw a short actionable message. */
+async function parseApiJson(response, label = 'API') {
+  const text = await response.text()
+  const trimmed = text.trim()
+  const head = trimmed.slice(0, 400).toLowerCase()
+  if (
+    trimmed.startsWith('<!DOCTYPE') ||
+    trimmed.startsWith('<html') ||
+    head.includes('<title>502</title>') ||
+    head.includes('<title>503</title>') ||
+    head.includes('<title>504</title>')
+  ) {
+    const base =
+      response.status >= 500
+        ? `${label}: server error (${response.status}). Backend or integration may be down or still starting.`
+        : `${label}: got an HTML error page instead of JSON (${response.status}).`
+    throw new Error(
+      `${base} Check VITE_BACKEND_URL / VITE_INTEGRATION_URL point to your API URLs, not the static frontend.`
+    )
+  }
+  if (!trimmed) return {}
+  try {
+    return JSON.parse(trimmed)
+  } catch {
+    const preview = trimmed.slice(0, 120)
+    throw new Error(
+      `${label}: response was not valid JSON (${response.status}). ${preview}${trimmed.length > 120 ? '…' : ''}`
+    )
+  }
+}
+
 export const useAuthStore = create((set, get) => ({
   // State
   user: null,
@@ -46,13 +77,17 @@ export const useAuthStore = create((set, get) => ({
         }),
       })
 
-      if (!response.ok) {
-        const err = await response.json().catch(() => ({}))
+      let result
+      try {
+        result = await parseApiJson(response, 'Login API')
+      } catch (e) {
         set({ isLoading: false })
-        return { success: false, error: err?.detail || 'Login failed' }
+        return { success: false, error: e.message || 'Login failed' }
       }
-
-      const result = await response.json()
+      if (!response.ok) {
+        set({ isLoading: false })
+        return { success: false, error: result?.detail || `Login failed (${response.status})` }
+      }
       if (!result?.success || !result?.session_id) {
         set({ isLoading: false })
         return { success: false, error: result?.message || 'Login failed' }
@@ -117,12 +152,17 @@ export const useAuthStore = create((set, get) => ({
           balance: Number(credentials.balanceAmount || 100000),
         }),
       })
-      if (!response.ok) {
-        const err = await response.json().catch(() => ({}))
+      let result
+      try {
+        result = await parseApiJson(response, 'Register API')
+      } catch (e) {
         set({ isLoading: false })
-        return { success: false, error: err?.detail || 'Registration failed' }
+        return { success: false, error: e.message || 'Registration failed' }
       }
-      const result = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        set({ isLoading: false })
+        return { success: false, error: result?.detail || `Registration failed (${response.status})` }
+      }
       set({ isLoading: false })
       return { success: !!result?.success, message: result?.message || 'Registration successful' }
     } catch (error) {
@@ -167,7 +207,7 @@ export const useAuthStore = create((set, get) => ({
     const readOne = async (strategy) => {
       try {
         const response = await fetch(`${INTEGRATION_BASE}/api/trading/status/${strategy}${suffix}`)
-        const json = await response.json().catch(() => ({}))
+        const json = await parseApiJson(response, 'Trading status').catch(() => ({}))
         return Boolean(json?.active)
       } catch (_) {
         return false
@@ -215,6 +255,7 @@ export const useAuthStore = create((set, get) => ({
           isLoading: false,
         })
         get().fetchSmartAllocation().catch(() => {})
+        get().refreshAllTradingStatuses().catch(() => {})
       } else {
         set({ isLoading: false })
       }
@@ -243,7 +284,7 @@ export const useAuthStore = create((set, get) => ({
       },
       body: JSON.stringify({ balance: amount }),
     })
-    const result = await response.json().catch(() => ({}))
+    const result = await parseApiJson(response, 'Balance API')
     if (!response.ok || !result?.success) {
       throw new Error(result?.detail || result?.message || 'Failed to update balance')
     }
@@ -278,7 +319,7 @@ export const useAuthStore = create((set, get) => ({
       const { balanceAmount } = get()
       // Use integration service as a stable gateway to allocator.
       const response = await fetch(`${INTEGRATION_BASE}/api/allocation/${balanceAmount}`)
-      const result = await response.json().catch(() => ({}))
+      const result = await parseApiJson(response, 'Allocation API')
 
       if (!response.ok) {
         throw new Error(result?.detail || `Allocation API failed (${response.status})`)
@@ -340,9 +381,9 @@ export const useAuthStore = create((set, get) => ({
           username: get().user?.username || undefined,
         })
       })
-      
-      const result = await response.json()
-      
+
+      const result = await parseApiJson(response, 'Start trading API')
+
       if (result.status) {
         const prev = get()
         const nextMl = strategy === 'ml' ? true : prev.mlSystemActive
@@ -371,9 +412,9 @@ export const useAuthStore = create((set, get) => ({
       const response = await fetch(`${INTEGRATION_BASE}/api/trading/stop/${strategy}${suffix}`, {
         method: 'POST'
       })
-      
-      const result = await response.json()
-      
+
+      const result = await parseApiJson(response, 'Stop trading API')
+
       if (result.status) {
         const nextMl = strategy === 'ml' ? false : get().mlSystemActive
         const nextLlm = strategy === 'llm' ? false : get().llmSystemActive
@@ -399,7 +440,7 @@ export const useAuthStore = create((set, get) => ({
     const response = await fetch(`${INTEGRATION_BASE}/api/trading/emergency-exit/${strategy}${suffix}`, {
       method: 'POST'
     })
-    const result = await response.json()
+    const result = await parseApiJson(response, 'Emergency exit API')
     if (!result.status) {
       throw new Error(result.message || 'Emergency exit failed')
     }
@@ -411,7 +452,7 @@ export const useAuthStore = create((set, get) => ({
     const response = await fetch(`${INTEGRATION_BASE}/api/trading/manual-reset/${strategy}${suffix}`, {
       method: 'POST'
     })
-    const result = await response.json()
+    const result = await parseApiJson(response, 'Manual reset API')
     if (!result.status) {
       throw new Error(result.message || 'Manual reset failed')
     }
@@ -422,7 +463,7 @@ export const useAuthStore = create((set, get) => ({
     try {
       const suffix = get()._userIdentityQuery()
       const response = await fetch(`${INTEGRATION_BASE}/api/trading/status/${strategy}${suffix}`)
-      const result = await response.json()
+      const result = await parseApiJson(response, 'Trading status')
       const active = Boolean(result?.active)
       if (strategy === 'ml') {
         set({
